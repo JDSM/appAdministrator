@@ -17,6 +17,7 @@ window.Vue = require('vue');
 
 
 Vue.component('categoria-component', require('./components/CategoriaComponent.vue'));
+Vue.component('articulo-component', require('./components/ArticuloComponent.vue'));
 
 const app = new Vue({
     el: '#app',

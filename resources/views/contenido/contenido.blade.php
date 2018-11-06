@@ -9,7 +9,7 @@
             <categoria-component></categoria-component>
         </template>   
         <template v-if="menu==2">
-            <h1>Contenido 2</h1>
+            <articulo-component></articulo-component>
         </template>
         <template v-if="menu==3">
             <h1>Contenido 3</h1>
