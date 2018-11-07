@@ -37,7 +37,7 @@ class ArticuloController extends Controller
             'articulos'=> $articulos
         ];
     }
-
+    
     public function store(Request $request)
     {
         if(!$request->ajax()){
