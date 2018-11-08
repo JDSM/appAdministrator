@@ -114,6 +114,9 @@
                                 <label class="col-md-3 form-control-label" for="text-input">Código</label>
                                 <div class="col-md-9">
                                     <input type="text" v-model="codigo" class="form-control" placeholder="Código de Barras">
+                                    <barcode :value="codigo" :options="{format: 'EAN-13'}">
+                                        Generando código de barras.
+                                    </barcode>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -165,6 +168,7 @@
 </template>
 
 <script>
+    import VueBarcode from 'vue-barcode';
     export default {
         data() {
             return {
@@ -195,6 +199,9 @@
                 buscar : '',
                 arrayCategoria: []
             }
+        },
+        components: {
+            'barcode': VueBarcode
         },
         computed : {
             isActived: function() {
@@ -284,9 +291,13 @@
                 }
                 let me = this;
                 axios.put('/articulo/actualizar',{
+                    'idcategoria': this.idcategoria,
+                    'codigo': this.codigo,
                     'nombre': this.nombre,
+                    'stock': this.stock,
+                    'precio_venta': this.precio_venta,
                     'descripcion': this.descripcion,
-                    'id': this.categoria_id
+                    'id': this.articulo_id
                 }).then(function(response){
                     me.cerrarModal();
                     me.listarArticulo(1, '', 'nombre');
