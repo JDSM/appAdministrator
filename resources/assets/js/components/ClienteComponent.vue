@@ -9,7 +9,7 @@
             <div class="card">
                 <div class="card-header">
                     <i class="fa fa-align-justify"></i> Clientes
-                    <button type="button" @click="abrirModal('persona','registar')" class="btn btn-secondary">
+                    <button type="button" @click="abrirModal('persona','registrar')" class="btn btn-secondary">
                         <i class="icon-plus"></i>&nbsp;Nuevo
                     </button>
                 </div>
@@ -87,18 +87,46 @@
                             <div class="form-group row">
                                 <label class="col-md-3 form-control-label" for="text-input">Nombre</label>
                                 <div class="col-md-9">
-                                    <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de categoría">
+                                    <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de persona">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Descripción</label>
+                                <label class="col-md-3 form-control-label" for="text-input">Tipo Documento</label>
                                 <div class="col-md-9">
-                                    <input type="text" v-model="descripcion" class="form-control" placeholder="Descripcion de la categoría">
+                                    <select v-model="tipo_documento" class="form-control">
+                                        <option value="DNI">DNI</option>
+                                        <option value="RUC">RUC</option>
+                                        <option value="PASS">PASS</option>
+                                    </select>
                                 </div>
                             </div>
-                            <div v-show="errorCategoria" class="form-group row div-error">
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Número Documento</label>
+                                <div class="col-md-9">
+                                    <input type="text" v-model="num_documento" class="form-control" placeholder="Número de Documento">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Dirección</label>
+                                <div class="col-md-9">
+                                    <input type="text" v-model="direccion" class="form-control" placeholder="Dirección">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Email</label>
+                                <div class="col-md-9">
+                                    <input type="email" v-model="email" class="form-control" placeholder="Email">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Telélefono</label>
+                                <div class="col-md-9">
+                                    <input type="text" v-model="telefono" class="form-control" placeholder="Telélefono">
+                                </div>
+                            </div>
+                            <div v-show="errorPersona" class="form-group row div-error">
                                 <div class="text-center alert alert-danger">
-                                    <div v-for="error in errorMostrarMsjCategoria" :key="error" v-text="error">
+                                    <div v-for="error in errorMostrarMsjPersona" :key="error" v-text="error">
 
                                     </div>
                                 </div>
@@ -107,8 +135,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" @click="cerrarModal" class="btn btn-secondary" >Cerrar</button>
-                        <button type="button" v-if="tipoAccion==1" @click="registrarCategoria()" class="btn btn-primary">Guardar</button>
-                        <button type="button" v-if="tipoAccion==2" @click="actualizarCategoria()" class="btn btn-primary">actualizar</button>
+                        <button type="button" v-if="tipoAccion==1" @click="registrarPersona()" class="btn btn-primary">Guardar</button>
+                        <button type="button" v-if="tipoAccion==2" @click="actualizarPersona()" class="btn btn-primary">actualizar</button>
 
                     </div>
                 </div>
@@ -199,74 +227,95 @@
                 //Envia la petición para visualizar la data de esa página
                 me.listarPersona(page, buscar, criterio);
             },
-            registrarCategoria() {
-                if (this.validarCategoria()){
+            registrarPersona() {
+                if (this.validarPersona()){
                     return;
                 }
                 let me = this;
-                axios.post('/categoria/registrar',{
+                axios.post('/cliente/registrar',{
                     'nombre': this.nombre,
-                    'descripcion': this.descripcion
+                    'tipo_documento': this.tipo_documento,
+                    'num_documento': this.num_documento,
+                    'direccion': this.direccion,
+                    'telefono': this.telefono,
+                    'email': this.email
                 }).then(function(response){
                     me.cerrarModal();
-                    me.listarCategoria(1,'','nombre');
+                    me.listarPersona(1,'','nombre');
                 }).catch(function (error){
                     console.log(error);
                 });
             },
-            actualizarCategoria(){
-                if (this.validarCategoria()){
+            actualizarPersona(){
+                if (this.validarPersona()){
                     return;
                 }
                 let me = this;
-                axios.put('/categoria/actualizar',{
+                axios.put('/cliente/actualizar',{
                     'nombre': this.nombre,
-                    'descripcion': this.descripcion,
-                    'id': this.categoria_id
+                    'tipo_documento': this.tipo_documento,
+                    'num_documento': this.num_documento,
+                    'direccion': this.direccion,
+                    'telefono': this.telefono,
+                    'email': this.email,
+                    'id': this.persona_id
                 }).then(function(response){
                     me.cerrarModal();
-                    me.listarCategoria(1, '', 'nombre');
+                    me.listarPersona(1, '', 'nombre');
                 }).catch(function (error){
                     console.log(error);
                 });
             },
-            validarCategoria(){
-                this.errorCategoria = 0;
-                this.errorMostrarMsjCategoria =[];
+            validarPersona(){
+                this.errorPersona = 0;
+                this.errorMostrarMsjPersona =[];
 
                 if (!this.nombre) { 
-                    this.errorMostrarMsjCategoria.push ("El nombre de la Categoría no puede estar vacío.");
+                    this.errorMostrarMsjPersona.push ("El nombre del cliente no puede estar vacío.");
                 }
-                if (this.errorMostrarMsjCategoria.length) {
-                    this.errorCategoria = 1;
+                if (this.errorMostrarMsjPersona.length) {
+                    this.errorPersona = 1;
                 }
-                return this.errorCategoria;
+                return this.errorPersona;
             },
             cerrarModal() {
                 this.modal=0;
                 this.tituloModal='';
                 this.nombre='';
-                this.descripcion='';
+                this.tipo_documento='DNI';
+                this.num_documento='';
+                this.direccion='';
+                this.telefono='';
+                this.email='';
+                this.errorPersona=0;
             },
             abrirModal(modelo,accion,data=[]) {
                 switch(modelo) {
-                    case 'categoria' : {
+                    case 'persona' : {
                         switch (accion) {
-                            case 'registar': {
+                            case 'registrar': {
                                 this.modal = 1;
-                                this.nombre = "",
-                                this.descripcion = "";
-                                this.tituloModal = "Registrar Categoría";
+                                this.nombre='';
+                                this.tipo_documento='DNI';
+                                this.num_documento='';
+                                this.direccion='';
+                                this.telefono='';
+                                this.email='';
+                                this.tituloModal = "Registrar Cliente";
                                 this.tipoAccion = 1;
                                 break;
                             }
                             case 'actualizar': {
                                 this.modal = 1;
-                                this.tituloModal = 'Actualizar categoría';
+                                this.tituloModal = 'Actualizar Cliente';
                                 this.tipoAccion = 2;
-                                this.categoria_id=data['id'];
-                                this.nombre = data['nombre'];
-                                this.descripcion = data['descripcion'];
+                                this.persona_id=data['id'];
+                                this.nombre=data['nombre'];
+                                this.tipo_documento=data['tipo_documento'];
+                                this.num_documento=data['num_docuemnto'];
+                                this.direccion=data['diereccion'];
+                                this.telefono=data['telefono'];
+                                this.email=data['email'];
                                 break;
                             }
                         }
