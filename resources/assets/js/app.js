@@ -19,6 +19,9 @@ window.Vue = require('vue');
 Vue.component('categoria-component', require('./components/CategoriaComponent.vue'));
 Vue.component('articulo-component', require('./components/ArticuloComponent.vue'));
 Vue.component('cliente-component', require('./components/ClienteComponent.vue'));
+Vue.component('proveedor-component', require('./components/ProveedorComponent.vue'));
+Vue.component('rol-component', require('./components/RolComponent.vue'));
+Vue.component('user-component', require('./components/UserComponent.vue'));
 
 const app = new Vue({
     el: '#app',

@@ -8,7 +8,7 @@
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Clientes
+                    <i class="fa fa-align-justify"></i> Proveedores
                     <button type="button" @click="abrirModal('persona','registrar')" class="btn btn-secondary">
                         <i class="icon-plus"></i>&nbsp;Nuevo
                     </button>
@@ -38,6 +38,7 @@
                                 <th>Dirección</th>
                                 <th>Teléfono</th>
                                 <th>Email</th>
+                                <th>Contacto</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -53,6 +54,7 @@
                                 <td v-text="persona.direccion"></td>
                                 <td v-text="persona.telefono"></td>
                                 <td v-text="persona.email"></td>
+                                <td v-text="persona.contacto"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -124,6 +126,18 @@
                                     <input type="text" v-model="telefono" class="form-control" placeholder="Telélefono">
                                 </div>
                             </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Contacto</label>
+                                <div class="col-md-9">
+                                    <input type="text" v-model="contacto" class="form-control" placeholder="Nombre del Contacto">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Telélefono del Contacto</label>
+                                <div class="col-md-9">
+                                    <input type="text" v-model="telefono_contacto" class="form-control" placeholder="Telélefono del Contacto">
+                                </div>
+                            </div>
                             <div v-show="errorPersona" class="form-group row div-error">
                                 <div class="text-center alert alert-danger">
                                     <div v-for="error in errorMostrarMsjPersona" :key="error" v-text="error">
@@ -159,6 +173,8 @@
                 direccion : '',
                 telefono : '',
                 email : '',
+                contacto : '',
+                telefono_contacto : '',
                 modal: 0,
                 arrayPersona: [],
                 tituloModal: '',
@@ -209,7 +225,7 @@
         methods : {
             listarPersona(page, buscar, criterio) {
                 let me = this;
-                var url = '/cliente?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio; 
+                var url = '/proveedor?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio; 
                 axios.get(url)
                 .then(function(response) {
                     var respuesta = response.data;
@@ -232,13 +248,15 @@
                     return;
                 }
                 let me = this;
-                axios.post('/cliente/registrar',{
+                axios.post('/proveedor/registrar',{
                     'nombre': this.nombre,
                     'tipo_documento': this.tipo_documento,
                     'num_documento': this.num_documento,
                     'direccion': this.direccion,
                     'telefono': this.telefono,
-                    'email': this.email
+                    'email': this.email,
+                    'contacto': this.contacto,
+                    'telefono_contacto': this.telefono_contacto
                 }).then(function(response){
                     me.cerrarModal();
                     me.listarPersona(1,'','nombre');
@@ -251,13 +269,15 @@
                     return;
                 }
                 let me = this;
-                axios.put('/cliente/actualizar',{
+                axios.put('/proveedor/actualizar',{
                     'nombre': this.nombre,
                     'tipo_documento': this.tipo_documento,
                     'num_documento': this.num_documento,
                     'direccion': this.direccion,
                     'telefono': this.telefono,
                     'email': this.email,
+                    'contacto': this.contacto,
+                    'telefono_contacto': this.telefono_contacto,
                     'id': this.persona_id
                 }).then(function(response){
                     me.cerrarModal();
@@ -282,11 +302,13 @@
                 this.modal=0;
                 this.tituloModal='';
                 this.nombre='';
-                this.tipo_documento='DNI';
+                this.tipo_documento='RUC';
                 this.num_documento='';
                 this.direccion='';
                 this.telefono='';
                 this.email='';
+                this.contacto='';
+                this.telefono_contacto='';
                 this.errorPersona=0;
             },
             abrirModal(modelo,accion,data=[]) {
@@ -296,18 +318,20 @@
                             case 'registrar': {
                                 this.modal = 1;
                                 this.nombre='';
-                                this.tipo_documento='DNI';
+                                this.tipo_documento='RUC';
                                 this.num_documento='';
                                 this.direccion='';
                                 this.telefono='';
                                 this.email='';
-                                this.tituloModal = "Registrar Cliente";
+                                this.contacto='';
+                                this.telefono_contacto='';
+                                this.tituloModal = "Registrar Proveedor";
                                 this.tipoAccion = 1;
                                 break;
                             }
                             case 'actualizar': {
                                 this.modal = 1;
-                                this.tituloModal = 'Actualizar Cliente';
+                                this.tituloModal = 'Actualizar Proveedor';
                                 this.tipoAccion = 2;
                                 this.persona_id=data['id'];
                                 this.nombre=data['nombre'];
@@ -316,6 +340,8 @@
                                 this.direccion=data['direccion'];
                                 this.telefono=data['telefono'];
                                 this.email=data['email'];
+                                this.contacto=data['contacto'];
+                                this.telefono_contacto=data['telefono_contacto'];
                                 break;
                             }
                         }
