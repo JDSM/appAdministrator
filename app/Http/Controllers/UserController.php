@@ -19,7 +19,7 @@ class UserController extends Controller
         $criterio = $request->criterio;
         if($buscar==''){
             $personas = User::join ('personas','users.id','=','personas.id')
-            ->join ('roles','users.id','=','roles.id')
+            ->join ('roles','users.idrol','=','roles.id')
             ->select('personas.id','personas.nombre','personas.tipo_documento',
             'personas.num_documento','personas.direccion','personas.telefono',
             'personas.email','users.usuario','users.password', 'users.condicion',
@@ -27,7 +27,7 @@ class UserController extends Controller
             ->orderBy('personas.id', 'desc')->paginate(3);
         }else{
             $personas = User::join ('personas','users.id','=','personas.id')
-            ->join ('roles','users.id','=','roles.id')
+            ->join ('roles','users.idrol','=','roles.id')
             ->select('personas.id','personas.nombre','personas.tipo_documento',
             'personas.num_documento','personas.direccion','personas.telefono',
             'personas.email','users.usuario','users.password', 'users.condicion',

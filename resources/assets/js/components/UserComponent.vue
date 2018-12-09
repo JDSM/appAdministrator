@@ -47,7 +47,18 @@
                                 <td>
                                     <button type="button" @click="abrirModal('persona','actualizar',persona)" class="btn btn-warning btn-sm" >
                                         <i class="icon-pencil"></i>
-                                    </button> 
+                                    </button> &nbsp;
+                                    <template v-if="persona.condicion">
+                                        <button type="button" class="btn btn-danger btn-sm" @click="desactivarUsuario(persona.id)" >
+                                            <i class="icon-trash"></i>
+                                        </button>
+                                    </template>
+                                    <template v-else>
+                                        <button type="button" class="btn btn-info btn-sm" @click="activarUsuario(persona.id)" >
+                                            <i class="icon-check"></i>
+                                        </button>
+                                    </template>
+
                                 </td>
                                 <td v-text="persona.nombre"></td>
                                 <td v-text="persona.tipo_documento"></td>
@@ -281,7 +292,8 @@
                     'telefono': this.telefono,
                     'email': this.email,
                     'usuario': this.usuario,
-                    'password': this.password
+                    'password': this.password,
+                    'idrol': this.idrol
                 }).then(function(response){
                     me.cerrarModal();
                     me.listarPersona(1,'','nombre');
@@ -294,15 +306,16 @@
                     return;
                 }
                 let me = this;
-                axios.put('/proveedor/actualizar',{
+                axios.put('/user/actualizar',{
                     'nombre': this.nombre,
                     'tipo_documento': this.tipo_documento,
                     'num_documento': this.num_documento,
                     'direccion': this.direccion,
                     'telefono': this.telefono,
                     'email': this.email,
-                    'contacto': this.contacto,
-                    'telefono_contacto': this.telefono_contacto,
+                    'usuario': this.usuario,
+                    'password': this.password,
+                    'idrol': this.idrol,
                     'id': this.persona_id
                 }).then(function(response){
                     me.cerrarModal();
@@ -316,12 +329,95 @@
                 this.errorMostrarMsjPersona =[];
 
                 if (!this.nombre) { 
-                    this.errorMostrarMsjPersona.push ("El nombre del cliente no puede estar vacío.");
+                    this.errorMostrarMsjPersona.push ("El nombre de la persona no puede estar vacío.");
+                }
+                if (!this.usuario) { 
+                    this.errorMostrarMsjPersona.push ("El nombre del usuario no puede estar vacío.");
+                }
+                if (!this.password) {
+                    this.errorMostrarMsjPersona.push ("El password no puede estar vacío.");
+                }
+                if (this.idrol==0) {
+                    this.errorMostrarMsjPersona.push ("Debe seleccionar un rol para el usuario.");
                 }
                 if (this.errorMostrarMsjPersona.length) {
                     this.errorPersona = 1;
                 }
                 return this.errorPersona;
+            },
+            activarUsuario(id){
+                const swalWithBootstrapButtons = swal.mixin({
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                })
+                swalWithBootstrapButtons({
+                title: 'Estas seguro de activar este usuario?',
+                text: "No podrás revertir esto!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar!',
+                cancelButtonText: 'Cancelar!',
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    let me = this;
+                    axios.put('/user/activar',{
+                        'id': id
+                    }).then(function(response){
+                        me.listarPersona(1, '' , 'nombre');
+                        swalWithBootstrapButtons(
+                            'Activado!',
+                            'Elregistro ha sido activado con éxito',
+                            'success'
+                        )
+                    }).catch(function (error){
+                        console.log(error);
+                    });
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+                    
+                }
+                })
+            },
+            desactivarUsuario(id){
+                const swalWithBootstrapButtons = swal.mixin({
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                })
+                swalWithBootstrapButtons({
+                title: 'Estas seguro de desactivar este usuario?',
+                text: "No podrás revertir esto!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar!',
+                cancelButtonText: 'Cancelar!',
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    let me = this;
+                    axios.put('/user/desactivar',{
+                        'id': id
+                    }).then(function(response){
+                        me.listarPersona(1, '', 'nombre');
+                        swalWithBootstrapButtons(
+                            'Desactivado!',
+                            'Elregistro ha sido desactivado con éxito',
+                            'success'
+                        )
+                    }).catch(function (error){
+                        console.log(error);
+                    });
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+                    
+                }
+                })
             },
             cerrarModal() {
                 this.modal=0;
