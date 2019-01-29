@@ -22,6 +22,7 @@ Vue.component('cliente-component', require('./components/ClienteComponent.vue'))
 Vue.component('proveedor-component', require('./components/ProveedorComponent.vue'));
 Vue.component('rol-component', require('./components/RolComponent.vue'));
 Vue.component('user-component', require('./components/UserComponent.vue'));
+Vue.component('ingreso-component', require('./components/IngresoComponent.vue'));
 
 const app = new Vue({
     el: '#app',
