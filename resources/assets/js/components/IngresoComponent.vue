@@ -93,9 +93,9 @@
                         <div class="col-md-9">
                             <div class="form-group">
                                 <label for="">Proveedor(*)</label>
-                                <select class="form-control">
+                                <v-select @search="selectProveedor" label='nombre' :options="arrayProveedor" placeholder="Buscar Proveedores..." :onChange="getDatosProveedor">
 
-                                </select>
+                                </v-select>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -261,6 +261,7 @@
 </template>
 
 <script>
+    import  vSelect  from 'vue-select';
     export default {
         data() {
             return {
@@ -274,6 +275,8 @@
                 total : 0.0,
                 arrayIngreso : [],
                 arrayDetalle : [],
+                arrayProveedor : [],
+                listado: 1,
                 modal: 0,
                 tituloModal: '',
                 tipoAccion: 0,
@@ -291,6 +294,9 @@
                 criterio : 'num_comprobante',
                 buscar : ''
             }
+        },
+        components: {
+            vSelect
         },
         computed : {
             isActived: function() {
@@ -333,6 +339,26 @@
                 .catch(function(error) {
                     console.log(error);
                 });
+            },
+            selectProveedor(search, loading){
+                let me=this;
+                loading(true)
+                var url= '/proveedor/selectProveedor?filtro='+search;
+                axios.get(url).then(function (response){
+                    console.log(response);
+                    let respuesta = response.data;
+                    q: search
+                    me.arrayProveedor=respuesta.proveedores;
+                    loading(false)
+                })
+                .catch(function (error){
+                    console.log(error);
+                });
+            },
+            getDatosProveedor(val1){
+                let me = this;
+                me.loading = true;
+                me.idproveedor = val1.id;
             },
             selectRol(){
                 let me = this;
@@ -492,6 +518,12 @@
                     
                 }
                 })
+            },
+            mostrarDetalle(){
+                this.listado=0;
+            },
+            ocultarDetalle(){
+                this.listado=1;
             },
             cerrarModal() {
                 this.modal=0;
