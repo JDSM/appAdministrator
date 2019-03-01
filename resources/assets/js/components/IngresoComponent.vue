@@ -129,28 +129,41 @@
                     <div class="form-group row border">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Artículo</label>
+                                <label>Artículo 
+                                    <span style="color:red;" v-show="idarticulo==0">
+                                        (*Seleccione)
+                                    </span>
+                                </label>
                                 <div class="form-inline">
-                                    <input type="text" class="form-control" v-model="idarticulo" placeholder="Ingrese artículo">
+                                    <input type="text" class="form-control" v-model="codigo" @keyup.enter="buscarArticulo()" placeholder="Ingrese artículo">
                                     <button class="btn btn-primary">...</button>
+                                    <input type="text" readonly class="form-control" v-model="articulo" >
                                 </div>                                    
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
-                                <label>Precio</label>
+                                <label>Precio
+                                    <span style="color:red;" v-show="precio==0">
+                                        (*Ingrese)
+                                    </span>
+                                </label>
                                 <input type="number" value="0" step="any" class="form-control" v-model="precio">
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
-                                <label>Cantidad</label>
+                                <label>Cantidad
+                                    <span style="color:red;" v-show="cantidad==0">
+                                        (*Ingrese)
+                                    </span>
+                                </label>
                                 <input type="number" value="0" class="form-control" v-model="cantidad">
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
-                                <button class="btn btn-success form-control btnagregar"><i class="icon-plus"></i></button>
+                                <button @click="agregarDetalle()" class="btn btn-success form-control btnagregar"><i class="icon-plus"></i></button>
                             </div>
                         </div>
                     </div>
@@ -166,45 +179,26 @@
                                         <th>Subtotal</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
+                                <tbody v-if="arrayDetalle.length">
+                                    <tr v-for="detalle in arrayDetalle" :key="detalle.id">
                                         <td>
-                                            <button type="button" class="btn btn-danger btn-sm">
+                                            <button @click="eliminarDetalle(index)" type="button" class="btn btn-danger btn-sm">
                                                 <i class="icon-close"></i>
                                             </button>
                                         </td>
-                                        <td>
-                                            Artículo n
+                                        <td v-text="detalle.articulo">
                                         </td>
                                         <td>
-                                            <input type="number" value="3" class="form-control">
+                                            <input v-model="detalle.precio" type="number" value="3" class="form-control">
                                         </td>
                                         <td>
-                                            <input type="number" value="2" class="form-control">
+                                            <input v-model="detalle.cantidad" type="number" value="2" class="form-control">
                                         </td>
                                         <td>
-                                            $ 6.00
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <button type="button" class="btn btn-danger btn-sm">
-                                                <i class="icon-close"></i>
-                                            </button>
-                                        </td>
-                                        <td>
-                                            Artículo n
-                                        </td>
-                                        <td>
-                                            <input type="number" value="3" class="form-control">
-                                        </td>
-                                        <td>
-                                            <input type="number" value="2" class="form-control">
-                                        </td>
-                                        <td>
-                                            $ 6.00
+                                            {{detalle.precio*detalle.cantidad}}
                                         </td>
                                     </tr>
+                                    
                                     <tr style="background-color: #CEECF5;">
                                         <td colspan="4" align="right"><strong>Total Parcial:</strong></td>
                                         <td>$ 5</td>
@@ -217,7 +211,14 @@
                                         <td colspan="4" align="right"><strong>Total Neto:</strong></td>
                                         <td>$ 6</td>
                                     </tr>
-                                </tbody>                                    
+                                </tbody> 
+                                <tbody v-else>
+                                    <tr>
+                                        <td colspan="5">
+                                            No hay artículos agregados
+                                        </td>
+                                    </tr>
+                                </tbody>                                   
                             </table>
                         </div>
                     </div>
@@ -292,7 +293,13 @@
                 },
                 offset : 3,
                 criterio : 'num_comprobante',
-                buscar : ''
+                buscar : '',
+                arrayArticulo: [],
+                idarticulo: 0,
+                codigo: '',
+                articulo: '',
+                precio: 0,
+                cantidad: 0
             }
         },
         components: {
@@ -360,6 +367,25 @@
                 me.loading = true;
                 me.idproveedor = val1.id;
             },
+            buscarArticulo(){
+                let me = this;
+                var url = '/articulo/buscarArticulo?filtro='+ me.codigo;
+                axios.get(url).then(function (response){
+                    var respuesta = response.data;
+                    me.arrayArticulo = respuesta.articulos;
+                    if (me.arrayArticulo.length > 0) {
+                        me.articulo = me.arrayArticulo[0]['nombre'];
+                        me.idarticulo = me.arrayArticulo[0]['id'];
+                    }
+                    else{
+                        me.articulo = 'No existe artículo';
+                        me.idarticulo = 0;
+                    }
+                })
+                .catch(function (error){
+                    console.log(error);
+                });
+            },
             selectRol(){
                 let me = this;
                 var url = '/rol/selectRol'; 
@@ -378,6 +404,49 @@
                 me.pagination.current_page = page;
                 //Envia la petición para visualizar la data de esa página
                 me.listarIngreso(page, buscar, criterio);
+            },
+            encuentra(id) {
+                let me = this;
+                console.log("entra"+id+'/'+me.arrayDetalle.length);
+                
+                var sw = 0;
+                for (let i = 0; i < me.arrayDetalle.length; i++) {
+                    console.log(me.arrayDetalle[i].idarticulo);
+                    if (me.arrayDetalle[i].idarticulo == id) {
+                        sw = true;
+                    } 
+                }
+                return sw;
+            },
+            agregarDetalle() {
+                let me=this;
+                if (me.idarticulo == 0 || me.cantidad == 0 || me.precio == 0) {
+                    
+                }
+                else{
+                    if (me.encuentra(me.idarticulo)) {
+                        console.log("alerta");
+                        swal({
+                            type: 'error',
+                            title: "Error ...",
+                            text: " Ese Artículo ya se encuentra agregado",
+                        })
+                    }
+                    else {
+                        console.log("no entra");
+                        me.arrayDetalle.push({
+                            idarticulo: me.idarticulo,
+                            articulo: me.articulo,
+                            cantidad: me.cantidad,
+                            precio: me.precio
+                        });
+                        me.codigo = "";
+                        me.idarticulo = 0;
+                        me.articulo = "";
+                        me.cantidad = 0;
+                        me.precio = 0;
+                    }
+                }
             },
             registrarPersona() {
                 if (this.validarPersona()){
