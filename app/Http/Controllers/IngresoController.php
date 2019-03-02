@@ -59,7 +59,7 @@ class IngresoController extends Controller
             $mytime= Carbon::now('America/Bogota');
             $ingreso = new Ingreso();
             $ingreso->idproveedor= $request->idproveedor;
-            $ingreso->usuario = \Auth::user()->id;
+            $ingreso->idusuario = \Auth::user()->id;
             $ingreso->tipo_comprobante = $request->tipo_comprobante;
             $ingreso->serie_comprobante = $request->serie_comprobante;
             $ingreso->num_comprobante = $request->num_comprobante;
@@ -69,7 +69,7 @@ class IngresoController extends Controller
             $ingreso->estado = 'Registrado';
             $ingreso->save();
 
-            $detalles = $recuest->data; //Array de detalles
+            $detalles = $request->data; //Array de detalles
             //Recorre todos los elementos
             foreach($detalles as $ep=>$det)
             {

@@ -125,6 +125,15 @@
                                 <input type="text" class="form-control" v-model="num_comprobante" placeholder="000xx">
                             </div>
                         </div>
+                        <div class="col-md-12">
+                            <div v-show="errorIngreso" class="form-group row div-error">
+                                <div class="text-center alert alert-danger">
+                                    <div v-for="error in errorMostrarMsjIngreso" :key="error" v-text="error">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group row border">
                         <div class="col-md-6">
@@ -136,7 +145,7 @@
                                 </label>
                                 <div class="form-inline">
                                     <input type="text" class="form-control" v-model="codigo" @keyup.enter="buscarArticulo()" placeholder="Ingrese artículo">
-                                    <button class="btn btn-primary">...</button>
+                                    <button @click="abrirModal()" class="btn btn-primary">...</button>
                                     <input type="text" readonly class="form-control" v-model="articulo" >
                                 </div>                                    
                             </div>
@@ -180,7 +189,7 @@
                                     </tr>
                                 </thead>
                                 <tbody v-if="arrayDetalle.length">
-                                    <tr v-for="detalle in arrayDetalle" :key="detalle.id">
+                                    <tr v-for="(detalle,index) in arrayDetalle" :key="detalle.id">
                                         <td>
                                             <button @click="eliminarDetalle(index)" type="button" class="btn btn-danger btn-sm">
                                                 <i class="icon-close"></i>
@@ -195,21 +204,21 @@
                                             <input v-model="detalle.cantidad" type="number" value="2" class="form-control">
                                         </td>
                                         <td>
-                                            {{detalle.precio*detalle.cantidad}}
+                                            $ &nbsp;{{detalle.precio*detalle.cantidad}}
                                         </td>
                                     </tr>
                                     
                                     <tr style="background-color: #CEECF5;">
                                         <td colspan="4" align="right"><strong>Total Parcial:</strong></td>
-                                        <td>$ 5</td>
+                                        <td>$ {{totalParcial = (total-totalImpuesto).toFixed(2)}}</td>
                                     </tr>
                                     <tr style="background-color: #CEECF5;">
                                         <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
-                                        <td>$ 1</td>
+                                        <td>$ {{totalImpuesto = ((total*impuesto)/(1+impuesto)).toFixed(2)}}</td>
                                     </tr>
                                     <tr style="background-color: #CEECF5;">
                                         <td colspan="4" align="right"><strong>Total Neto:</strong></td>
-                                        <td>$ 6</td>
+                                        <td>$ {{total = calcularTotal}}</td>
                                     </tr>
                                 </tbody> 
                                 <tbody v-else>
@@ -245,7 +254,56 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <select class="form-control col-md-3" v-model="criterioA" >
+                                        <option value="nombre">Nombre</option>
+                                        <option value="descripcion">Descripción</option>
+                                        <option value="codigo">Código</option>
+                                    </select>
+                                    <input type="text" v-model="buscarA" @keyup.enter="listarArticulo(buscarA, criterioA)" class="form-control" placeholder="Texto a buscar">
+                                    <button type="submit" @click="listarArticulo(buscarA, criterioA)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Opciones</th>
+                                        <th>Código</th>
+                                        <th>Nombre</th>
+                                        <th>Categoría</th>
+                                        <th>Precio Venta</th>
+                                        <th>Stock</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="articulo in arrayArticulo" :key="articulo.id">
+                                        <td>
+                                            <button type="button" @click="agregarDetalleModal(articulo)" class="btn btn-success btn-sm" >
+                                                <i class="icon-check"></i>
+                                            </button>
+                                        </td>
+                                        <td v-text="articulo.codigo"></td>
+                                        <td v-text="articulo.nombre"></td>
+                                        <td v-text="articulo.nombre_categoria"></td>
+                                        <td v-text="articulo.precio_venta"></td>
+                                        <td v-text="articulo.stock"></td>
+                                        <td>
+                                            <div v-if="articulo.condicion">
+                                                <span class="badge badge-success">Activo</span>
+                                            </div>
+                                            <div v-else>
+                                                <span class="badge badge-danger">Desactivado</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
@@ -299,7 +357,12 @@
                 codigo: '',
                 articulo: '',
                 precio: 0,
-                cantidad: 0
+                cantidad: 0,
+                totalImpuesto: 0.0,
+                totalParcial: 0.0,
+                criterioA: 'nombre',
+                buscarA: '' 
+
             }
         },
         components: {
@@ -331,6 +394,14 @@
                     from++;
                 }
                 return pagesArray;
+            },
+            calcularTotal: function() {
+                let me = this;
+                let resultado = 0.0;
+                for (let i= 0; i < me.arrayDetalle.length; i++) {
+                     resultado = resultado + (me.arrayDetalle[i].precio*me.arrayDetalle[i].cantidad);
+                }
+                return resultado;
             }
         },
         methods : {
@@ -342,6 +413,18 @@
                     var respuesta = response.data;
                     me.arrayIngreso = respuesta.ingresos.data;
                     me.pagination = respuesta.pagination;
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
+            },
+            listarArticulo(buscarA, criterioA) {
+                let me = this;
+                var url = '/articulo/listarArticulo?buscar=' + buscarA + '&criterio=' + criterioA; 
+                axios.get(url)
+                .then(function(response) {
+                    var respuesta = response.data;
+                    me.arrayArticulo = respuesta.articulos.data;
                 })
                 .catch(function(error) {
                     console.log(error);
@@ -425,7 +508,7 @@
                 }
                 else{
                     if (me.encuentra(me.idarticulo)) {
-                        console.log("alerta");
+                        //console.log("alerta");
                         swal({
                             type: 'error',
                             title: "Error ...",
@@ -433,7 +516,7 @@
                         })
                     }
                     else {
-                        console.log("no entra");
+                        //console.log("no entra");
                         me.arrayDetalle.push({
                             idarticulo: me.idarticulo,
                             articulo: me.articulo,
@@ -448,71 +531,86 @@
                     }
                 }
             },
-            registrarPersona() {
-                if (this.validarPersona()){
+            agregarDetalleModal(data = []){
+                let me = this;
+                if (me.encuentra(data['id'])) {
+                    //console.log("alerta");
+                    swal({
+                        type: 'error',
+                        title: "Error ...",
+                        text: " Ese Artículo ya se encuentra agregado",
+                    })
+                }
+                else {
+                    //console.log("no entra");
+                    me.arrayDetalle.push({
+                        idarticulo: data['id'],
+                        articulo: data['nombre'],
+                        cantidad: 1,
+                        precio: 1
+                    });
+                }
+            },
+            eliminarDetalle (index) {
+                let me=this;
+                me.arrayDetalle.splice(index, 1);
+            },
+            registrarIngreso() {
+                if (this.validarIngreso()){
                     return;
                 }
                 let me = this;
-                axios.post('/user/registrar',{
-                    'nombre': this.nombre,
-                    'tipo_documento': this.tipo_documento,
-                    'num_documento': this.num_documento,
-                    'direccion': this.direccion,
-                    'telefono': this.telefono,
-                    'email': this.email,
-                    'usuario': this.usuario,
-                    'password': this.password,
-                    'idrol': this.idrol
+                axios.post('/ingreso/registrar',{
+                    'idproveedor': this.idproveedor,
+                    'tipo_comprobante': this.tipo_comprobante,
+                    'num_comprobante': this.num_comprobante,
+                    'serie_comprobante': this.serie_comprobante,
+                    'impuesto': this.impuesto,
+                    'total': this.total,
+                    'data': this.arrayDetalle
                 }).then(function(response){
-                    me.cerrarModal();
-                    me.listarPersona(1,'','nombre');
-                }).catch(function (error){
-                    console.log(error);
-                });
-            },
-            actualizarPersona(){
-                if (this.validarPersona()){
-                    return;
-                }
-                let me = this;
-                axios.put('/user/actualizar',{
-                    'nombre': this.nombre,
-                    'tipo_documento': this.tipo_documento,
-                    'num_documento': this.num_documento,
-                    'direccion': this.direccion,
-                    'telefono': this.telefono,
-                    'email': this.email,
-                    'usuario': this.usuario,
-                    'password': this.password,
-                    'idrol': this.idrol,
-                    'id': this.persona_id
-                }).then(function(response){
-                    me.cerrarModal();
-                    me.listarPersona(1, '', 'nombre');
-                }).catch(function (error){
-                    console.log(error);
-                });
-            },
-            validarPersona(){
-                this.errorPersona = 0;
-                this.errorMostrarMsjPersona =[];
+                    me.listado = 1;
+                    me.listarIngreso(1,'','num_comprobante');
+                    me.idproveedor = 0;
+                    me.tipo_comprobante = 'BOLETA';
+                    me.serie_comprobante = '',
+                    me.num_comprobante = '',
+                    me.impuesto = 0.19;
+                    me.total = 0.0;
+                    me.idarticulo = 0;
+                    me.articulo = '';
+                    me.precio = 0;
+                    me. cantidad = 0;
+                    me.arrayDetalle = [];
 
-                if (!this.nombre) { 
-                    this.errorMostrarMsjPersona.push ("El nombre de la persona no puede estar vacío.");
+                }).catch(function (error){
+                    console.log(error);
+                });
+            },
+            validarIngreso(){
+                this.errorIngreso = 0;
+                this.errorMostrarMsjIngreso =[];
+
+                if (this.idproveedor == 0) { 
+                    this.errorMostrarMsjIngreso.push ("Seleccione un Proveedor.");
                 }
-                if (!this.usuario) { 
-                    this.errorMostrarMsjPersona.push ("El nombre del usuario no puede estar vacío.");
+                if (this.tipo_comprobante == 0) { 
+                    this.errorMostrarMsjIngreso.push ("Seleccione el comprobante.");
                 }
-                if (!this.password) {
-                    this.errorMostrarMsjPersona.push ("El password no puede estar vacío.");
+                if (!this.num_comprobante) { 
+                    this.errorMostrarMsjIngreso.push ("Ingrese el número de comprobante.");
                 }
-                if (this.idrol==0) {
-                    this.errorMostrarMsjPersona.push ("Debe seleccionar un rol para el usuario.");
+                if (!this.impuesto) { 
+                    this.errorMostrarMsjIngreso.push ("Ingrese el impuesto de compra.");
                 }
-                if (this.errorMostrarMsjPersona.length) {
-                    this.errorPersona = 1;
+                if (this.arrayDetalle.length <=0) { 
+                    this.errorMostrarMsjIngreso.push ("Ingrese detalles.");
                 }
-                return this.errorPersona;
+                
+                if (this.errorMostrarMsjIngreso.length) {
+                    this.errorIngreso = 1;
+                }
+                return this.errorIngreso;
             },
             activarUsuario(id){
                 const swalWithBootstrapButtons = swal.mixin({
@@ -589,7 +687,19 @@
                 })
             },
             mostrarDetalle(){
-                this.listado=0;
+                let me = this;
+                me.listado=0;
+                me.idproveedor = 0;
+                me.tipo_comprobante = 'BOLETA';
+                me.serie_comprobante = '',
+                me.num_comprobante = '',
+                me.impuesto = 0.19;
+                me.total = 0.0;
+                me.idarticulo = 0;
+                me.articulo = '';
+                me.precio = 0;
+                me. cantidad = 0;
+                me.arrayDetalle = [];
             },
             ocultarDetalle(){
                 this.listado=1;
@@ -597,58 +707,12 @@
             cerrarModal() {
                 this.modal=0;
                 this.tituloModal='';
-                this.nombre='';
-                this.tipo_documento='DNI';
-                this.num_documento='';
-                this.direccion='';
-                this.telefono='';
-                this.email='';
-                this.usuario='';
-                this.password='';
-                this.idrol=0;
-                this.errorPersona=0;
+                
             },
-            abrirModal(modelo,accion,data=[]) {
-                this.selectRol();
-                switch(modelo) {
-                    case 'persona' : {
-                        switch (accion) {
-                            case 'registrar': {
-                                this.modal = 1;
-                                this.nombre='';
-                                this.tipo_documento='DNI';
-                                this.num_documento='';
-                                this.direccion='';
-                                this.telefono='';
-                                this.email='';
-                                this.usuario='';
-                                this.password='';
-                                this.idrol=0;
-                                this.tituloModal = "Registrar Usuario";
-                                this.tipoAccion = 1;
-                                break;
-                            }
-                            case 'actualizar': {
-                                this.modal = 1;
-                                this.tituloModal = 'Actualizar Usuario';
-                                this.tipoAccion = 2;
-                                this.persona_id=data['id'];
-                                this.nombre=data['nombre'];
-                                this.tipo_documento=data['tipo_documento'];
-                                this.num_documento=data['num_documento'];
-                                this.direccion=data['direccion'];
-                                this.telefono=data['telefono'];
-                                this.email=data['email'];
-                                this.usuario=data['usuario'];
-                                this.password=data['password'];
-                                this.idrol=data['idrol'];
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                    
-                }
+            abrirModal() {
+                this.arrayArticulo = [];
+                this.modal = 1;
+                this.tituloModal = "Seleccione uno o varios artículos";
             }
         },
         mounted() {
