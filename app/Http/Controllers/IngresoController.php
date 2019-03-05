@@ -24,7 +24,6 @@ class IngresoController extends Controller
             'ingresos.num_comprobante','ingresos.fecha_hora','ingresos.impuesto',
             'ingresos.total','ingresos.estado','personas.nombre','users.usuario')
             ->orderBy('ingresos.id', 'desc')->paginate(3);
-            echo $ingresos;
         }else{
             $ingresos = Ingreso::join ('personas','ingresos.idproveedor','=','personas.id')
             ->join ('users','ingresos.idusuario','=','users.id')
@@ -33,9 +32,7 @@ class IngresoController extends Controller
             'ingresos.total','ingresos.estado','personas.nombre','users.usuario')
             ->where('ingresos.'.$criterio, 'like', '%'. $buscar . '%')
             ->orderBy('ingresos.id', 'desc')->paginate(3);
-            echo $ingresos;
         }
-        
         return [
             'pagination'=> [
                 'total'         =>$ingresos->total(),
@@ -47,6 +44,33 @@ class IngresoController extends Controller
             ],
             'ingresos'=> $ingresos
         ];
+    }
+    public function obtenerCabecera(Request $request){
+        if(!$request->ajax()){
+            return redirect('/');
+        }
+        $id = $request->id;
+        $ingreso = Ingreso::join ('personas','ingresos.idproveedor','=','personas.id')
+        ->join ('users','ingresos.idusuario','=','users.id')
+        ->select('ingresos.id','ingresos.tipo_comprobante','ingresos.serie_comprobante',
+        'ingresos.num_comprobante','ingresos.fecha_hora','ingresos.impuesto',
+        'ingresos.total','ingresos.estado','personas.nombre','users.usuario')
+        ->where('ingresos.id','=', $id)
+        ->orderBy('ingresos.id', 'desc')->take(1)
+        ->get();   
+        return ['ingreso'=> $ingreso];
+    }
+    public function obtenerDetalles(Request $request){
+        if(!$request->ajax()){
+            return redirect('/');
+        }
+        $id = $request->id;
+        $detalles = DetalleIngreso::join ('articulos','detalle_ingreso.idarticulo','=','articulos.id')
+        ->select('detalle_ingreso.cantidad','detalle_ingreso.precio','articulos.nombre as articulo')
+        ->where('detalle_ingreso.idingreso','=', $id)
+        ->orderBy('detalle_ingreso.id', 'desc')
+        ->get();   
+        return ['detalles'=> $detalles];
     }
     public function store(Request $request)
     {
