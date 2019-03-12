@@ -51,6 +51,9 @@
                                         <button type="button" @click="verVenta(venta.id)" class="btn btn-success btn-sm">
                                         <i class="icon-eye"></i>
                                         </button> &nbsp;
+                                        <button type="button" @click="pdfVenta(venta.id)" class="btn btn-info btn-sm">
+                                        <i class="icon-doc"></i>
+                                        </button> &nbsp;
                                         <template v-if="venta.estado=='Registrado'">
                                             <button type="button" class="btn btn-danger btn-sm" @click="desactivarVenta(venta.id)">
                                                 <i class="icon-trash"></i>
@@ -293,6 +296,7 @@
                                         <th>Artículo</th>
                                         <th>Precio</th>
                                         <th>Cantidad</th>
+                                        <th>Descuento</th>
                                         <th>Subtotal</th>
                                     </tr>
                                 </thead>
@@ -302,27 +306,28 @@
                                         </td>
                                         <td v-text="detalle.precio"></td>
                                         <td v-text="detalle.cantidad"></td>
+                                        <td v-text="detalle.descuento"></td>
                                         <td>
-                                            $ &nbsp;{{detalle.precio*detalle.cantidad}}
+                                            $ &nbsp;{{detalle.precio*detalle.cantidad-descuento}}
                                         </td>
                                     </tr>
                                     
                                     <tr style="background-color: #CEECF5;">
-                                        <td colspan="3" align="right"><strong>Total Parcial:</strong></td>
+                                        <td colspan="4" align="right"><strong>Total Parcial:</strong></td>
                                         <td>$ {{totalParcial = (total-totalImpuesto).toFixed(2)}}</td>
                                     </tr>
                                     <tr style="background-color: #CEECF5;">
-                                        <td colspan="3" align="right"><strong>Total Impuesto:</strong></td>
+                                        <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
                                         <td>$ {{totalImpuesto = (total*impuesto).toFixed(2)}}</td>
                                     </tr>
                                     <tr style="background-color: #CEECF5;">
-                                        <td colspan="3" align="right"><strong>Total Neto:</strong></td>
+                                        <td colspan="4" align="right"><strong>Total Neto:</strong></td>
                                         <td>$ {{total}}</td>
                                     </tr>
                                 </tbody> 
                                 <tbody v-else>
                                     <tr>
-                                        <td colspan="4">
+                                        <td colspan="5">
                                             No hay artículos agregados
                                         </td>
                                     </tr>
@@ -530,6 +535,9 @@
                     console.log(error);
                 });
             },
+            pdfVenta(id){
+                window.open('http://localhost:8000/venta/pdf/'+id+','+'_blank'); 
+            },
             selectCliente(search, loading){
                 let me=this;
                 loading(true)
@@ -703,6 +711,7 @@
                     me.codigo = '';
                     me.detalle = 0;
                     me.arrayDetalle = [];
+                    window.open('http://localhost:8000/venta/pdf/'+response.data.id+','+'_blank'); 
 
                 }).catch(function (error){
                     console.log(error);
@@ -762,8 +771,8 @@
                     }).then(function(response){
                         me.listarVenta(1, '', 'num_comprobante');
                         swal(
-                            'Anulado!',
-                            ' El venta ha sido anulado con éxito',
+                            'Anulada!',
+                            ' El venta ha sido anulada con éxito',
                             'success'
                         )
                     }).catch(function (error){

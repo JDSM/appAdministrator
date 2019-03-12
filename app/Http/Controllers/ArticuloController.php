@@ -156,4 +156,15 @@ class ArticuloController extends Controller
         $articulo->condicion = '1';
         $articulo->save();
     }
+
+    public function listarPdf()
+    {
+        $articulos = Articulo::join('categorias', 'articulos.idcategoria','=','categorias.id' )
+            ->select('articulos.id','articulos.idcategoria','articulos.codigo', 'articulos.nombre', 'categorias.nombre as nombre_categoria', 'articulos.precio_venta', 'articulos.stock', 'articulos.descripcion','articulos.condicion')
+            ->orderBy('articulos.nombre', 'desc')->get();
+
+        $cont = Articulo::count();
+        $pdf = \PDF::loadView('pdf.articulospdf',['articulos'=>$articulos, 'cont'=>$cont]);
+        return $pdf->download('articulos.pdf');
+    }
 }
