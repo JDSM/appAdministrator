@@ -15,7 +15,7 @@
                         <a class="nav-link" href="#"><i class="icon-basket-loaded"></i> Ventas</a>
                     </li>
                     <li @click="menu=6" class="nav-item">
-                        <a class="nav-link" href="#"><i class="icon-notebook"></i> Clientes</a>
+                        <a class="nav-link" href="#"><i class="icon-user-female"></i> Clientes</a>
                     </li>
                 </ul>
             </li>

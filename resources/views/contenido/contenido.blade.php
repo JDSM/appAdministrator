@@ -17,6 +17,12 @@
             <template v-if="menu==4">
                 <proveedor-component></proveedor-component>
             </template>
+            <template v-if="menu==13">
+            <produccion-component></produccion-component>
+            </template>
+            <template v-if="menu==14">
+            <receta-component></receta-component>
+            </template>
             <template v-if="menu==5">
             <venta-component></venta-component>
             </template>
@@ -76,6 +82,11 @@
             <template v-if="menu==4">
                 <proveedor-component></proveedor-component>
             </template>
+            <template v-if="menu==13">
+            <produccion-component></produccion-component>
+            </template>
+            <template v-if="menu==14">
+            <receta-component></receta-component>
             <template v-if="menu==9">
                 <h1>Reporte de Ingresos</h1>
             </template>

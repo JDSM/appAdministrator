@@ -15,6 +15,8 @@ class Venta extends Model
         'fecha_hora',
         'impuesto',
         'total',
-        'estado'
+        'estado',
+        'tipo_venta',
+        'fecha_pago'
     ];
 }

@@ -103,6 +103,9 @@ class IngresoController extends Controller
                 $detalle->cantidad = $det['cantidad'];
                 $detalle->precio=$det['precio'];
                 $detalle->save();
+                $id_detalle=$detalle->id;
+                $contenido= DB::table('articulos')->select('contenido')->where('id',$det['idarticulo'])->get()->toArray();
+                $ingre_costArt= DB::table('costo_articulos')->insert(['cantidad' => $det['cantidad'], 'costo_articulo' => $det['precio'], 'contenido' => $contenido[0]->contenido, 'idarticulo' => $det['idarticulo'], 'id_detalle_ingreso' => $id_detalle]);
             }
             DB::commit();
 
@@ -118,5 +121,9 @@ class IngresoController extends Controller
         $ingreso = Ingreso::findOrFail($request->id);
         $ingreso->estado = 'Anulado';
         $ingreso->save();
+        $id_detalle = DB::table('detalle_ingreso')->where('idingreso',$request->id)->get()->toArray();
+        for ($i = 0; $i <count($id_detalle); $i++) { 
+            $des_costArt = DB::update('update costo_articulos set cantidad=0 where id_detalle_ingreso=?',[$id_detalle[$i]->id]);
+        }
     }
 }

@@ -8,7 +8,7 @@
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Ingresos
+                    <i class="fa fa-align-justify"></i> Recetas
                     <button type="button" @click="mostrarDetalle()" class="btn btn-secondary">
                         <i class="icon-plus"></i>&nbsp;Nuevo
                     </button>
@@ -20,12 +20,11 @@
                         <div class="col-md-6">
                             <div class="input-group">
                                 <select class="form-control col-md-3" v-model="criterio">
-                                    <option value="tipo_comprobante">Tipo Comprobante</option>
-                                    <option value="num_comprobante">Número Comprobante</option>
-                                    <option value="fecha_hora">Fecha-Hora</option>
+                                    <option value="nombre">Nombre Artículo</option>
+                                    <option value="codigo">Código Artículo</option>
                                 </select>
-                                <input type="text" v-model="buscar" @keyup.enter="listarIngreso(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                <button type="submit" @click="listarIngreso(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                <input type="text" v-model="buscar" @keyup.enter="listarReceta(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                <button type="submit" @click="listarReceta(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                             </div>
                         </div>
                     </div>
@@ -34,38 +33,26 @@
                             <thead>
                                 <tr>
                                     <th>Opciones</th>
-                                    <th>Usuario</th>
-                                    <th>Proveedor</th>
-                                    <th>Tipo Comprobante</th>
-                                    <th>Serie Comprobante</th>
-                                    <th>Número Comprobante</th>
-                                    <th>Fecha Hora</th>
-                                    <th>Total</th>
-                                    <th>Impuesto</th>
-                                    <th>Estado</th>
+                                    <th>Código Artículo</th>
+                                    <th>Nombre Artículo</th>
+                                    <th>Contenido</th>
+                                    <th>Ingrediente Principal</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="ingreso in arrayIngreso" :key="ingreso.id">
+                                <tr v-for="receta in arrayReceta" :key="receta.id">
                                     <td>
-                                        <button type="button" @click="verIngreso(ingreso.id)" class="btn btn-success btn-sm">
-                                        <i class="icon-eye"></i>
+                                        <button type="button" @click="editReceta(receta.id)" class="btn btn-success btn-sm">
+                                        <i class="icon-pencil"></i>
                                         </button> &nbsp;
-                                        <template v-if="ingreso.estado=='Registrado'">
-                                            <button type="button" class="btn btn-danger btn-sm" @click="desactivarIngreso(ingreso.id)">
-                                                <i class="icon-trash"></i>
-                                            </button>
-                                        </template>
+                                        <button type="button" class="btn btn-danger btn-sm" @click="desactivarReceta(receta.id)">
+                                            <i class="icon-trash"></i>
+                                        </button>
                                     </td>
-                                    <td v-text="ingreso.usuario"></td>
-                                    <td v-text="ingreso.nombre"></td>
-                                    <td v-text="ingreso.tipo_comprobante"></td>
-                                    <td v-text="ingreso.serie_comprobante"></td>
-                                    <td v-text="ingreso.num_comprobante"></td>
-                                    <td v-text="ingreso.fecha_hora"></td>
-                                    <td v-text="ingreso.total"></td>
-                                    <td v-text="ingreso.impuesto"></td>
-                                    <td v-text="ingreso.estado"></td>
+                                    <td v-text="receta.codigo"></td>
+                                    <td v-text="receta.nombre"></td>
+                                    <td v-text="receta.contenido"></td>
+                                    <td v-text="receta.nombre_ingrediente"></td>
                                 </tr>                                
                             </tbody>
                         </table>
@@ -90,45 +77,44 @@
                 <template v-else-if="listado==0">
                 <div class="card-body">
                     <div class="form-group row border">
-                        <div class="col-md-9">
+                        <div class="col-md-12" >
                             <div class="form-group">
-                                <label for="">Proveedor(*)</label>
-                                <v-select @search="selectProveedor" label='nombre' :options="arrayProveedor" placeholder="Buscar Proveedores..." :onChange="getDatosProveedor">
-
-                                </v-select>
+                                <label>Artículo a Producir
+                                    <span style="color:red;" v-show="idarticulo==0">
+                                        (*Seleccione)
+                                    </span>
+                                </label>
+                                <div class="form-inline">
+                                    <input type="text" class="form-control" v-model="codigo_articulo" @keyup.enter="buscarArticulo()" placeholder="Ingrese artículo">
+                                    <button @click="abrirModal(1)" class="btn btn-primary">...</button>
+                                    <input type="text" readonly class="form-control" v-model="articulo" >
+                                </div>                                    
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <label for="">Impuesto(*)</label>
-                            <input type="text" class="form-control" v-model="impuesto">
+                        <div class="col-md-8" >
+                            <div class="form-group">
+                                <label>Ingrediente Principal
+                                    <span style="color:red;" v-show="idingrediente==0">
+                                        (*Seleccione)
+                                    </span>
+                                </label>
+                                <div class="form-inline">
+                                    <input type="text" class="form-control" v-model="codigo_ingrediente" @keyup.enter="buscarIngrediente()" placeholder="Ingrese artículo">
+                                    <button @click="abrirModal(2)" class="btn btn-primary">...</button>
+                                    <input type="text" readonly class="form-control" v-model="ingrediente" >
+                                </div>                                    
+                            </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label>Tipo Comprobante(*)</label>
-                                <select class="form-control" v-model="tipo_comprobante">
-                                    <option value="0">Seleccione</option>
-                                    <option value="BOLETA">Boleta</option>
-                                    <option value="FACTURA">Factura</option>
-                                    <option value="TICKET">Ticket</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Serie Comprobante</label>
-                                <input type="text" class="form-control" v-model="serie_comprobante" placeholder="000x">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Número Comprobante(*)</label>
-                                <input type="text" class="form-control" v-model="num_comprobante" placeholder="000xx">
+                                <label>Cantidad (g,ml,c/u):</label>
+                                <input type="number" class="form-control" v-model="contenido_ingrediente">
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <div v-show="errorIngreso" class="form-group row div-error">
+                            <div v-show="errorReceta" class="form-group row div-error">
                                 <div class="text-center alert alert-danger">
-                                    <div v-for="error in errorMostrarMsjIngreso" :key="error" v-text="error">
+                                    <div v-for="error in errorMostrarMsjReceta" :key="error" v-text="error">
 
                                     </div>
                                 </div>
@@ -136,48 +122,29 @@
                         </div>
                     </div>
                     <div class="form-group row border">
-                        <div class="col-md-5" style="padding-right:0px !important;">
+                        <div class="col-md-6" style="padding-right:0px !important;">
                             <div class="form-group">
-                                <label>Artículo 
-                                    <span style="color:red;" v-show="idarticulo==0">
+                                <label>Ingredientes 
+                                    <span style="color:red;" v-show="idingredientes==0">
                                         (*Seleccione)
                                     </span>
                                 </label>
                                 <div class="form-inline">
-                                    <input type="text" class="form-control" v-model="codigo" @keyup.enter="buscarArticulo()" placeholder="Ingrese artículo">
-                                    <button @click="abrirModal()" class="btn btn-primary">...</button>
-                                    <input type="text" readonly class="form-control" v-model="articulo" >
+                                    <input type="text" class="form-control" v-model="codigo_ingredientes" @keyup.enter="buscarIngredientes()" placeholder="Ingrese artículo">
+                                    <button @click="abrirModal(3)" class="btn btn-primary">...</button>
+                                    <input type="text" readonly class="form-control" v-model="ingredientes" >
                                 </div>                                    
                             </div>
                         </div>
+                        
                         <div class="col-md-2">
                             <div class="form-group">
-                                <label>Precio
-                                    <span style="color:red;" v-show="precio==0">
+                                <label>Cantidad (g,ml,c/u):
+                                    <span style="color:red;" v-show="contenido_ingredientes==0">
                                         (*Ingrese)
                                     </span>
                                 </label>
-                                <input type="number" value="0" step="any" class="form-control" v-model="precio">
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label>Cantidad
-                                    <span style="color:red;" v-show="cantidad==0">
-                                        (*Ingrese)
-                                    </span>
-                                </label>
-                                <input type="number" value="0" class="form-control" v-model="cantidad">
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label>Contenido
-                                    <span style="color:red;" v-show="contenido==0">
-                                        (*Ingrese)
-                                    </span>
-                                </label>
-                                <input type="number" value="0" class="form-control" v-model="contenido">
+                                <input type="number" value="0" class="form-control" v-model="contenido_ingredientes">
                             </div>
                         </div>
                         <div class="col-md-1">
@@ -192,11 +159,8 @@
                                 <thead>
                                     <tr>
                                         <th>Opciones</th>
-                                        <th>Artículo</th>
-                                        <th>Precio</th>
-                                        <th>Cantidad</th>
+                                        <th>Ingrediente</th>
                                         <th>Contenido</th>
-                                        <th>Subtotal</th>
                                     </tr>
                                 </thead>
                                 <tbody v-if="arrayDetalle.length">
@@ -206,30 +170,10 @@
                                                 <i class="icon-close"></i>
                                             </button>
                                         </td>
-                                        <td v-text="detalle.articulo"></td>
+                                        <td v-text="detalle.ingredientes"></td>
                                         <td>
-                                            <input v-model="detalle.precio" type="number" value="3" class="form-control">
+                                            <input v-model="detalle.contenido_ingredientes" type="number" value="2" class="form-control">
                                         </td>
-                                        <td>
-                                            <input v-model="detalle.cantidad" type="number" value="2" class="form-control">
-                                        </td>
-                                        <td v-text="detalle.contenido"></td>
-                                        <td>
-                                            $ &nbsp;{{detalle.precio*detalle.cantidad}}
-                                        </td>
-                                    </tr>
-                                    
-                                    <tr style="background-color: #CEECF5;">
-                                        <td colspan="5" align="right"><strong>Total Parcial:</strong></td>
-                                        <td>$ {{totalParcial = (total-totalImpuesto).toFixed(2)}}</td>
-                                    </tr>
-                                    <tr style="background-color: #CEECF5;">
-                                        <td colspan="5" align="right"><strong>Total Impuesto:</strong></td>
-                                        <td>$ {{totalImpuesto = ((total*impuesto)/(1+impuesto)).toFixed(2)}}</td>
-                                    </tr>
-                                    <tr style="background-color: #CEECF5;">
-                                        <td colspan="5" align="right"><strong>Total Neto:</strong></td>
-                                        <td>$ {{total = calcularTotal}}</td>
                                     </tr>
                                 </tbody> 
                                 <tbody v-else>
@@ -245,42 +189,81 @@
                     <div class="form-group row">
                         <div class="col-md-12">
                             <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
-                            <button type="button" class="btn btn-primary" @click="registrarIngreso()">Registrar Compra</button>
+                            <button type="button" class="btn btn-primary" @click="registrarReceta()">Registrar Receta</button>
                         </div>
                     </div>
                 </div>
                 </template>
                 <!-- Fin Detalle-->
-                <!-- ver ingreso -->
+                <!-- Editar Receta -->
                 <template v-else-if="listado==2">
                 <div class="card-body">
                     <div class="form-group row border">
-                        <div class="col-md-9">
+                        <div class="col-md-12" >
                             <div class="form-group">
-                                <label for="">Proveedor</label>
-                                <p v-text="proveedor"></p>
+                                <label>Artículo a Producir</label>
+                                <p v-text="nombre"></p>                                 
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <label for="">Impuesto</label>
-                            <p v-text="impuesto"></p>
+                        <div class="col-md-8" >
+                            <div class="form-group">
+                                <label>Ingrediente Principal
+                                    <span style="color:red;" v-show="idingrediente==0">
+                                        (*Seleccione)
+                                    </span>
+                                </label>
+                                <div class="form-inline">
+                                    <input type="text" class="form-control" v-model="codigo_ingrediente" @keyup.enter="buscarIngrediente()" placeholder="Ingrese artículo">
+                                    <button @click="abrirModal(2)" class="btn btn-primary">...</button>
+                                    <input type="text" readonly class="form-control" v-model="ingrediente" >
+                                </div>                                    
+                            </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label>Tipo Comprobante</label>
-                                <p v-text="tipo_comprobante"></p>
+                                <label>Cantidad (g,ml,c/u):</label>
+                                <input type="number" class="form-control" v-model="contenido_ingrediente">
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Serie Comprobante</label>
-                                <p v-text="serie_comprobante"></p>
+                        <div class="col-md-12">
+                            <div v-show="errorReceta" class="form-group row div-error">
+                                <div class="text-center alert alert-danger">
+                                    <div v-for="error in errorMostrarMsjReceta" :key="error" v-text="error">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                    </div>
+                    <div class="form-group row border">
+                        <div class="col-md-6" style="padding-right:0px !important;">
                             <div class="form-group">
-                                <label>Número Comprobante</label>
-                                <p v-text="num_comprobante"></p>
+                                <label>Ingredientes 
+                                    <span style="color:red;" v-show="idingredientes==0">
+                                        (*Seleccione)
+                                    </span>
+                                </label>
+                                <div class="form-inline">
+                                    <input type="text" class="form-control" v-model="codigo_ingredientes" @keyup.enter="buscarIngredientes()" placeholder="Ingrese artículo">
+                                    <button @click="abrirModal(3)" class="btn btn-primary">...</button>
+                                    <input type="text" readonly class="form-control" v-model="ingredientes" >
+                                </div>                                    
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Contenido
+                                    <span style="color:red;" v-show="contenido_ingredientes==0">
+                                        (*Ingrese)
+                                    </span>
+                                </label>
+                                <input type="number" value="0" class="form-control" v-model="contenido_ingredientes">
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="form-group">
+                                <button @click="agregarDetalle()" class="btn btn-success form-control btnagregar"><i class="icon-plus"></i></button>
                             </div>
                         </div>
                     </div>
@@ -289,40 +272,27 @@
                             <table class="table table-bordered table-striped table-sm">
                                 <thead>
                                     <tr>
-                                        <th>Artículo</th>
-                                        <th>Precio</th>
-                                        <th>Cantidad</th>
+                                        <th>Opciones</th>
+                                        <th>Ingrediente</th>
                                         <th>Contenido</th>
-                                        <th>Subtotal</th>
                                     </tr>
                                 </thead>
                                 <tbody v-if="arrayDetalle.length">
-                                    <tr v-for="detalle in arrayDetalle" :key="detalle.id">
-                                        <td v-text="detalle.articulo"></td>
-                                        <td v-text="detalle.precio"></td>
-                                        <td v-text="detalle.cantidad"></td>
-                                        <td v-text="detalle.contenido"></td>
+                                    <tr v-for="(detalle,index) in arrayDetalle" :key="detalle.id">
                                         <td>
-                                            $ &nbsp;{{detalle.precio*detalle.cantidad}}
+                                            <button @click="eliminarDetalle(index)" type="button" class="btn btn-danger btn-sm">
+                                                <i class="icon-close"></i>
+                                            </button>
                                         </td>
-                                    </tr>
-                                    
-                                    <tr style="background-color: #CEECF5;">
-                                        <td colspan="3" align="right"><strong>Total Parcial:</strong></td>
-                                        <td>$ {{totalParcial = (total-totalImpuesto).toFixed(2)}}</td>
-                                    </tr>
-                                    <tr style="background-color: #CEECF5;">
-                                        <td colspan="3" align="right"><strong>Total Impuesto:</strong></td>
-                                        <td>$ {{totalImpuesto = (total*impuesto).toFixed(2)}}</td>
-                                    </tr>
-                                    <tr style="background-color: #CEECF5;">
-                                        <td colspan="3" align="right"><strong>Total Neto:</strong></td>
-                                        <td>$ {{total}}</td>
+                                        <td v-text="detalle.ingredientes"></td>
+                                        <td>
+                                            <input v-model="detalle.contenido_ingredientes" type="number" value="2" class="form-control">
+                                        </td>
                                     </tr>
                                 </tbody> 
                                 <tbody v-else>
                                     <tr>
-                                        <td colspan="4">
+                                        <td colspan="6">
                                             No hay artículos agregados
                                         </td>
                                     </tr>
@@ -333,11 +303,12 @@
                     <div class="form-group row">
                         <div class="col-md-12">
                             <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                            <button type="button" class="btn btn-primary" @click="registrarReceta()">Registrar Receta</button>
                         </div>
                     </div>
                 </div>
                 </template>
-                <!-- Fin ver ingreso -->
+                <!-- Fin Editar Receta -->
             </div>
             <!-- Fin ejemplo de tabla Listado -->
         </div>
@@ -382,8 +353,18 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="articulo in arrayArticulo" :key="articulo.id">
-                                        <td>
+                                        <td v-if="validar_tipo==3">
                                             <button type="button" @click="agregarDetalleModal(articulo)" class="btn btn-success btn-sm" >
+                                                <i class="icon-check"></i>
+                                            </button>
+                                        </td>
+                                        <td v-if="validar_tipo==2">
+                                            <button type="button" @click="agregarIngrediente(articulo)" class="btn btn-success btn-sm" >
+                                                <i class="icon-check"></i>
+                                            </button>
+                                        </td>
+                                        <td v-if="validar_tipo==1">
+                                            <button type="button" @click="agregarArticulo(articulo)" class="btn btn-success btn-sm" >
                                                 <i class="icon-check"></i>
                                             </button>
                                         </td>
@@ -409,8 +390,6 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                        <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarPersona()">Guardar</button>
-                        <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarPersona()">Actualizar</button>
                     </div>
                 </div>
                 <!-- /.modal-content -->
@@ -426,23 +405,22 @@
     export default {
         data() {
             return {
-                ingreso_id : 0,
-                idproveedor : 0,
+                ingrediente : '',
+                ingredientes : '',
+                idingrediente : 0,
+                principal : 0,
                 nombre : '',
-                tipo_comprobante : 'BOLETA',
-                serie_comprobante : '',
-                num_comprobante : '',
-                impuesto : 0.19,
-                total : 0.0,
-                arrayIngreso : [],
+                arrayReceta : [],
                 arrayDetalle : [],
-                arrayProveedor : [],
+                arrayArticulo : [],
+                arrayIngrediente : [],
+                arrayIngredientes : [],
                 listado: 1,
                 modal: 0,
                 tituloModal: '',
                 tipoAccion: 0,
-                errorIngreso : 0,
-                errorMostrarMsjIngreso : [],
+                errorReceta : 0,
+                errorMostrarMsjReceta : [],
                 pagination : {
                     'total' : 0,
                     'current_page' : 0,
@@ -452,21 +430,20 @@
                     'to' : 0
                 },
                 offset : 3,
-                criterio : 'num_comprobante',
+                criterio : 'nombre',
                 buscar : '',
-                arrayArticulo: [],
                 idarticulo: 0,
-                codigo: '',
+                idingredientes: 0,
+                codigo_articulo: '',
+                codigo_ingrediente:'',
+                codigo_ingredientes:'',
                 articulo: '',
-                precio: 0,
                 cantidad: 0,
-                contenido: 0,
-                totalImpuesto: 0.0,
-                totalParcial: 0.0,
+                contenido_ingrediente: 0,
+                contenido_ingredientes: 0,
                 criterioA: 'nombre',
                 buscarA: '',
-                proveedor: '' 
-
+                validar_tipo : 0
             }
         },
         components: {
@@ -499,23 +476,15 @@
                 }
                 return pagesArray;
             },
-            calcularTotal: function() {
-                let me = this;
-                let resultado = 0.0;
-                for (let i= 0; i < me.arrayDetalle.length; i++) {
-                     resultado = resultado + (me.arrayDetalle[i].precio*me.arrayDetalle[i].cantidad);
-                }
-                return resultado;
-            }
         },
         methods : {
-            listarIngreso(page, buscar, criterio) {
+            listarReceta(page, buscar, criterio) {
                 let me = this;
-                var url = '/ingreso?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio; 
+                var url = '/receta?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio; 
                 axios.get(url)
                 .then(function(response) {
                     var respuesta = response.data;
-                    me.arrayIngreso = respuesta.ingresos.data;
+                    me.arrayReceta = respuesta.recetas.data;
                     me.pagination = respuesta.pagination;
                 })
                 .catch(function(error) {
@@ -534,29 +503,9 @@
                     console.log(error);
                 });
             },
-            selectProveedor(search, loading){
-                let me=this;
-                loading(true)
-                var url= '/proveedor/selectProveedor?filtro='+search;
-                axios.get(url).then(function (response){
-                    console.log(response);
-                    let respuesta = response.data;
-                    q: search
-                    me.arrayProveedor=respuesta.proveedores;
-                    loading(false)
-                })
-                .catch(function (error){
-                    console.log(error);
-                });
-            },
-            getDatosProveedor(val1){
-                let me = this;
-                me.loading = true;
-                me.idproveedor = val1.id;
-            },
             buscarArticulo(){
                 let me = this;
-                var url = '/articulo/buscarArticulo?filtro='+ me.codigo;
+                var url = '/articulo/buscarArticulo?filtro='+ me.codigo_articulo;
                 axios.get(url).then(function (response){
                     var respuesta = response.data;
                     me.arrayArticulo = respuesta.articulos;
@@ -573,15 +522,41 @@
                     console.log(error);
                 });
             },
-            selectRol(){
+            buscarIngrediente(){
                 let me = this;
-                var url = '/rol/selectRol'; 
-                axios.get(url)
-                .then(function(response) {
+                var url = '/articulo/buscarArticulo?filtro='+ me.codigo_ingrediente;
+                axios.get(url).then(function (response){
                     var respuesta = response.data;
-                    me.arrayRol = respuesta.roles;
+                    me.arrayIngrediente = respuesta.articulos;
+                    if (me.arrayIngrediente.length > 0) {
+                        me.ingrediente = me.arrayIngrediente[0]['nombre'];
+                        me.idingrediente = me.arrayIngrediente[0]['id'];
+                    }
+                    else{
+                        me.ingrediente = 'No existe artículo';
+                        me.idingrediente = 0;
+                    }
                 })
-                .catch(function(error) {
+                .catch(function (error){
+                    console.log(error);
+                });
+            },
+            buscarIngredientes(){
+                let me = this;
+                var url = '/articulo/buscarArticulo?filtro='+ me.codigo_ingredientes;
+                axios.get(url).then(function (response){
+                    var respuesta = response.data;
+                    me.arrayIngredientes = respuesta.articulos;
+                    if (me.arrayIngredientes.length > 0) {
+                        me.ingredientes = me.arrayIngredientes[0]['nombre'];
+                        me.idingredientes = me.arrayIngredientes[0]['id'];
+                    }
+                    else{
+                        me.ingredientes = 'No existe artículo';
+                        me.idingredientes = 0;
+                    }
+                })
+                .catch(function (error){
                     console.log(error);
                 });
             },
@@ -590,7 +565,7 @@
                 //Actualiza la página actual
                 me.pagination.current_page = page;
                 //Envia la petición para visualizar la data de esa página
-                me.listarIngreso(page, buscar, criterio);
+                me.listarReceta(page, buscar, criterio);
             },
             encuentra(id) {
                 let me = this;
@@ -607,11 +582,11 @@
             },
             agregarDetalle() {
                 let me=this;
-                if (me.idarticulo == 0 || me.cantidad == 0 || me.precio == 0 || me.contenido == 0) {
+                if (me.idingredientes== 0 || me.contenido_ingredientes == 0) {
                     
                 }
                 else{
-                    if (me.encuentra(me.idarticulo)) {
+                    if (me.encuentra(me.idingredientes)) {
                         //console.log("alerta");
                         swal({
                             type: 'error',
@@ -622,18 +597,14 @@
                     else {
                         //console.log("no entra");
                         me.arrayDetalle.push({
-                            idarticulo: me.idarticulo,
-                            articulo: me.articulo,
-                            cantidad: me.cantidad,
-                            contenido: me.contenido,
-                            precio: me.precio
+                            idingredientes: me.idingredientes,
+                            ingredientes: me.ingredientes,
+                            contenido: me.contenido
                         });
-                        me.codigo = "";
-                        me.idarticulo = 0;
-                        me.articulo = "";
-                        me.cantidad = 0;
-                        me.contenido = 0;
-                        me.precio = 0;
+                        me.codigo_ingredientes = "";
+                        me.idingredientes = 0;
+                        me.ingredientes = "";
+                        me.contenido_ingredientes = 0;
                     }
                 }
             },
@@ -650,79 +621,90 @@
                 else {
                     //console.log("no entra");
                     me.arrayDetalle.push({
-                        idarticulo: data['id'],
-                        articulo: data['nombre'],
-                        cantidad: 1,
-                        contenido: data['contenido'],
-                        precio: data['precio_venta']
+                        idingredientes: data['id'],
+                        ingredientes: data['nombre'],
+                        contenido_ingredientes: 1
                     });
+                }
+            },
+            agregarIngrediente(data = []){
+                let me = this;
+                if (me.encuentra(data['id'])) {
+                    //console.log("alerta");
+                    swal({
+                        type: 'error',
+                        title: "Error ...",
+                        text: " Ese Artículo ya se encuentra agregado",
+                    })
+                }
+                else {
+                    //console.log("no entra");
+                    me.idingrediente = data['id'];
+                    me.ingrediente = data['nombre'];
+                    me.contenido_ingrediente = 1;
+              
+                }
+            },
+            agregarArticulo(data = []){
+                let me = this;
+                if (me.encuentra(data['id'])) {
+                    //console.log("alerta");
+                    swal({
+                        type: 'error',
+                        title: "Error ...",
+                        text: " Ese Artículo ya se encuentra agregado",
+                    })
+                }
+                else {
+                    //console.log("no entra");
+                    me.idarticulo = data['id'];
+                    me.articulo = data['nombre'];
                 }
             },
             eliminarDetalle (index) {
                 let me=this;
                 me.arrayDetalle.splice(index, 1);
             },
-            registrarIngreso() {
-                if (this.validarIngreso()){
+            registrarReceta() {
+                if (this.validarReceta()){
                     return;
                 }
                 let me = this;
-                axios.post('/ingreso/registrar',{
-                    'idproveedor': this.idproveedor,
-                    'tipo_comprobante': this.tipo_comprobante,
-                    'num_comprobante': this.num_comprobante,
-                    'serie_comprobante': this.serie_comprobante,
-                    'impuesto': this.impuesto,
-                    'total': this.total,
+                axios.post('/receta/registrar',{
+                    'idarticulo': this.idarticulo,
+                    'principal': this.principal,
+                    'idingrediente': this.idingrediente,
+                    'contenido': this.contenido_ingrediente,
                     'data': this.arrayDetalle
                 }).then(function(response){
                     me.listado = 1;
-                    me.listarIngreso(1,'','num_comprobante');
-                    me.idproveedor = 0;
-                    me.tipo_comprobante = 'BOLETA';
-                    me.serie_comprobante = '',
-                    me.num_comprobante = '',
-                    me.impuesto = 0.19;
-                    me.total = 0.0;
+                    me.listarReceta(1,'','nombre');
                     me.idarticulo = 0;
+                    me.idingrediente = 0;
+                    me.ingrediente = '';
                     me.articulo = '';
-                    me.precio = 0;
-                    me. cantidad = 0;
-                    me.contenido = 0;
+                    me.contenido_ingrediente = 0;
                     me.arrayDetalle = [];
 
                 }).catch(function (error){
                     console.log(error);
                 });
             },
-            validarIngreso(){
-                this.errorIngreso = 0;
-                this.errorMostrarMsjIngreso =[];
-
-                if (this.idproveedor == 0) { 
-                    this.errorMostrarMsjIngreso.push ("Seleccione un Proveedor.");
-                }
-                if (this.tipo_comprobante == 0) { 
-                    this.errorMostrarMsjIngreso.push ("Seleccione el comprobante.");
-                }
-                if (!this.num_comprobante) { 
-                    this.errorMostrarMsjIngreso.push ("Ingrese el número de comprobante.");
-                }
-                if (!this.impuesto) { 
-                    this.errorMostrarMsjIngreso.push ("Ingrese el impuesto de compra.");
-                }
+            validarReceta(){
+                this.errorReceta = 0;
+                this.errorMostrarMsjReceta =[];
                 if (this.arrayDetalle.length <=0) { 
-                    this.errorMostrarMsjIngreso.push ("Ingrese detalles.");
+                    this.errorMostrarMsjReceta.push ("Ingrese detalles.");
                 }
                 
-                if (this.errorMostrarMsjIngreso.length) {
-                    this.errorIngreso = 1;
+                if (this.errorMostrarMsjReceta.length) {
+                    this.errorReceta = 1;
                 }
-                return this.errorIngreso;
+                return this.errorReceta;
             },
-            desactivarIngreso(id){
+            desactivarReceta(id){
                 swal({
-                title: 'Estas seguro de anular este ingreso?',
+                title: 'Estas seguro de anular esta Receta?',
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Aceptar!',
@@ -731,13 +713,13 @@
                 }).then((result) => {
                 if (result.value) {
                     let me = this;
-                    axios.put('/ingreso/desactivar',{
+                    axios.put('/receta/desactivar',{
                         'id': id
                     }).then(function(response){
-                        me.listarIngreso(1, '', 'num_comprobante');
+                        me.listarReceta(1, '', 'nombre');
                         swal(
                             'Anulado!',
-                            ' El ingreso ha sido anulado con éxito',
+                            ' La receta ha sido anulada con éxito',
                             'success'
                         )
                     }).catch(function (error){
@@ -754,48 +736,42 @@
             mostrarDetalle(){
                 let me = this;
                 me.listado=0;
-                me.idproveedor = 0;
-                me.tipo_comprobante = 'BOLETA';
-                me.serie_comprobante = '',
-                me.num_comprobante = '',
-                me.impuesto = 0.19;
-                me.total = 0.0;
+                me.idingrediente = 0;
+                me.ingrediente = '';
                 me.idarticulo = 0;
                 me.articulo = '';
-                me.precio = 0;
-                me. cantidad = 0;
-                me.contenido = 0;
+                me.contenido_ingrediente = 0;
                 me.arrayDetalle = [];
             },
             ocultarDetalle(){
                 this.listado=1;
             },
-            verIngreso(id){
+            editReceta(id){
                 let me = this;
                 me.listado=2;
-                //Obtener los datos del ingreso
-                var arrayIngresoT = [];
-                var url = '/ingreso/obtenerCabecera?id=' + id; 
+                //Obtener los datos de la receta
+                var arrayRecetaT = [];
+                var url = '/receta/edit?id=' + id; 
                 axios.get(url)
                 .then(function(response) {
                     var respuesta = response.data;
-                    arrayIngresoT = respuesta.ingreso;
-                    me.proveedor = arrayIngresoT[0]['nombre'];
-                    me.tipo_comprobante = arrayIngresoT[0]['tipo_comprobante'];
-                    me.num_comprobante = arrayIngresoT[0]['num_comprobante'];
-                    me.serie_comprobante = arrayIngresoT[0]['serie_comprobante'];
-                    me.impuesto = arrayIngresoT[0]['impuesto'];
-                    me.total = arrayIngresoT[0]['total'];
+                    arrayRecetaT = respuesta.receta;
+                    me.idarticulo = arrayRecetaT[0]['idarticulo'];
+                    me.articulo = arrayRecetaT[0]['nombre'];
+                    me.idingrediente = arrayRecetaT[0]['idingrediente'];
+                    me.ingrediente = arrayRecetaT[0]['nombre_ingrediente'];
+                    me.contenido_ingrediente = arrayRecetaT[0]['contenido'] 
                 })
                 .catch(function(error) {
                     console.log(error);
                 });
                 //Obtener los datos de los detalles
-                var urld = '/ingreso/obtenerDetalles?id=' + id; 
+                var urld = '/receta/obtenerDetalles?id=' + id; 
                 axios.get(urld)
                 .then(function(response) {
                     var respuesta = response.data;
                     me.arrayDetalle = respuesta.detalles;
+                    //console.log(me.arrayDetalle[0].nombre);
                 })
                 .catch(function(error) {
                     console.log(error);
@@ -806,14 +782,22 @@
                 this.tituloModal='';
                 
             },
-            abrirModal() {
-                this.arrayArticulo = [];
+            abrirModal(tipo) {
+                this.validar_tipo=tipo;
+                if (tipo==1) {
+                    this.arrayArticulo = [];
+                }else if(tipo==2){
+                    this.arrayIngrediente = [];
+                }else if (tipo==3) {
+                    this.arrayIngredientes = [];
+                }
+                
                 this.modal = 1;
                 this.tituloModal = "Seleccione uno o varios artículos";
             }
         },
         mounted() {
-            this.listarIngreso(1, this.buscar, this.criterio);
+            this.listarReceta(1, this.buscar, this.criterio);
         }
     }
 </script>

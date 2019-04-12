@@ -38,6 +38,8 @@
                                 <th>Categoría</th>
                                 <th>Precio Venta</th>
                                 <th>Stock</th>
+                                <th>Contenido</th>
+                                <th>Tipo</th>
                                 <th>Descripción</th>
                                 <th>Estado</th>
                             </tr>
@@ -64,6 +66,8 @@
                                 <td v-text="articulo.nombre_categoria"></td>
                                 <td v-text="articulo.precio_venta"></td>
                                 <td v-text="articulo.stock"></td>
+                                <td v-text="articulo.contenido"></td>
+                                <td v-text="articulo.tipo"></td>
                                 <td v-text="articulo.descripcion"></td>
                                 <td>
                                     <div v-if="articulo.condicion">
@@ -115,9 +119,11 @@
                             </div>
                             <div class="form-group row">
                                 <label class="col-md-3 form-control-label" for="text-input">Código</label>
-                                <div class="col-md-9">
+                                <div class="col-md-4">
                                     <input type="text" v-model="codigo" class="form-control" placeholder="Código de Barras">
-                                    <barcode :value="codigo" :options="{format: 'EAN-13'}">
+                                </div>
+                                <div class="col-md-5" >
+                                    <barcode :value="codigo" :options="options" :height=18 :weight=15>
                                         Generando código de barras.
                                     </barcode>
                                 </div>
@@ -138,6 +144,23 @@
                                 <label class="col-md-3 form-control-label" for="text-input">Stock</label>
                                 <div class="col-md-9">
                                     <input type="number" v-model="stock" class="form-control" placeholder="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Contenido(g/ml/u)</label>
+                                <div class="col-md-9">
+                                    <input type="number" v-model="contenido" class="form-control" placeholder="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Tipo</label>
+                                <div class="col-md-9">
+                                    <select class="form-control" v-model="tipo">
+                                        <option value="0" disabled>Seleccione</option>
+                                        <option value="1">Venta</option>
+                                        <option value="2">Producción</option>
+                                        <option value="3">Ingrediente</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -175,6 +198,12 @@
     export default {
         data() {
             return {
+                options : {
+                    format: 'EAN-13',
+                    lineColor: '#0275d8',
+                    width: 3,
+                    height: 60
+                },
                 articulo_id : 0,
                 idcategoria : 0,
                 nombre_categoria : '',
@@ -182,6 +211,8 @@
                 nombre : '',
                 precio_venta : 0,
                 stock : 0,
+                contenido : 0,
+                tipo : 1,
                 descripcion : '',
                 arrayArticulo : [],
                 modal : 0,
@@ -282,6 +313,8 @@
                     'codigo': this.codigo,
                     'nombre': this.nombre,
                     'stock': this.stock,
+                    'contenido' : this.contenido,
+                    'tipo' : this.tipo,
                     'precio_venta': this.precio_venta,
                     'descripcion': this.descripcion
                 }).then(function(response){
@@ -301,6 +334,8 @@
                     'codigo': this.codigo,
                     'nombre': this.nombre,
                     'stock': this.stock,
+                    'contenido' : this.contenido,
+                    'tipo' : this.tipo,
                     'precio_venta': this.precio_venta,
                     'descripcion': this.descripcion,
                     'id': this.articulo_id
@@ -398,6 +433,9 @@
                 if (!this.stock) { 
                     this.errorMostrarMsjArticulo.push ("El stock del Articulo debe ser un número y no puede estar vacío.");
                 }
+                if (!this.contenido) { 
+                    this.errorMostrarMsjArticulo.push ("El contenido del Articulo debe ser un número y no puede estar vacío.");
+                }
                 if (!this.precio_venta) { 
                     this.errorMostrarMsjArticulo.push ("El precio de venta del Articulo debe ser un número y no puede estar vacío.");
                 }
@@ -415,6 +453,8 @@
                 this.nombre='';
                 this.precio_venta=0;
                 this.stock=0;
+                this.contenido=0;
+                this.tipo=0;
                 this.descripcion='';
                 this.errorArticulo=0;
             },
@@ -431,6 +471,8 @@
                                 this.nombre='';
                                 this.precio_venta=0;
                                 this.stock=0;
+                                this.contenido=0;
+                                this.tipo=0;
                                 this.descripcion='';
                                 this.tipoAccion = 1;
                                 break;
@@ -444,6 +486,8 @@
                                 this.codigo=data['codigo'];
                                 this.nombre = data['nombre'];
                                 this.stock=data['stock'];
+                                this.contenido=data['contenido'];
+                                this.tipo=data['tipo'];
                                 this.precio_venta = data['precio_venta'];
                                 this.descripcion = data['descripcion'];
                                 break;

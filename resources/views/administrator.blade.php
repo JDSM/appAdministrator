@@ -49,6 +49,10 @@
                             <span class="badge badge-success">3</span>
                         </a>
                         <a class="dropdown-item" href="#">
+                            <i class="fa fa-dolly"></i> Producción
+                            <span class="badge badge-success">3</span>
+                        </a>
+                        <a class="dropdown-item" href="#">
                             <i class="fa fa-tasks"></i> Ventas
                             <span class="badge badge-danger">2</span>
                         </a>

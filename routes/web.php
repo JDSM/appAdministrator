@@ -45,7 +45,6 @@ Route::group(['middleware' => 'auth'], function () {
         //ingreso
         Route::get('/ingreso','IngresoController@index');
         Route::post('/ingreso/registrar','IngresoController@store');
-        Route::put('/ingreso/actualizar','IngresoController@update');
         Route::put('/ingreso/desactivar','IngresoController@desactivar');
         Route::get('/ingreso/obtenerCabecera','IngresoController@obtenerCabecera');
         Route::get('/ingreso/obtenerDetalle','IngresoController@obtenerDetalle');
@@ -63,7 +62,6 @@ Route::group(['middleware' => 'auth'], function () {
         //Venta
         Route::get('/venta','VentaController@index');
         Route::post('/venta/registrar','VentaController@store');
-        Route::put('/venta/actualizar','VentaController@update');
         Route::put('/venta/desactivar','VentaController@desactivar');
         Route::get('/venta/obtenerCabecera','VentaController@obtenerCabecera');
         Route::get('/venta/obtenerDetalles','VentaController@obtenerDetalles');
@@ -71,6 +69,12 @@ Route::group(['middleware' => 'auth'], function () {
     });
     
     Route::group(['middleware' => ['Administrador']], function () {
+        //Receta
+        Route::get('/receta','RecetaController@index');
+        Route::get('/receta/edit','RecetaController@edit');
+        Route::get('/receta/obtenerDetalles','RecetaController@obtenerDetalles');
+        Route::post('/receta/registrar','RecetaController@store');
+        Route::put('/receta/desactivar','RecetaController@desactivar');
         //Categoria
         Route::get('/categoria','CategoriaController@index');
         Route::post('/categoria/registrar','CategoriaController@store');
@@ -113,12 +117,10 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/ingreso/obtenerCabecera','IngresoController@obtenerCabecera');
         Route::get('/ingreso/obtenerDetalles','IngresoController@obtenerDetalles');
         Route::post('/ingreso/registrar','IngresoController@store');
-        Route::put('/ingreso/actualizar','IngresoController@update');
         Route::put('/ingreso/desactivar','IngresoController@desactivar');
         //Venta
         Route::get('/venta','VentaController@index');
         Route::post('/venta/registrar','VentaController@store');
-        Route::put('/venta/actualizar','VentaController@update');
         Route::put('/venta/desactivar','VentaController@desactivar');
         Route::get('/venta/obtenerCabecera','VentaController@obtenerCabecera');
         Route::get('/venta/obtenerDetalles','VentaController@obtenerDetalles');

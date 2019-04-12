@@ -26,6 +26,8 @@ class CreateVentasTable extends Migration
             $table->decimal('impuesto', 4, 2);
             $table->decimal('total', 11, 2);
             $table->string('estado', 20);
+            $table->string('tipo_venta', 50);
+            $table->date('fecha_pago');
             $table->timestamps();
         });
     }
