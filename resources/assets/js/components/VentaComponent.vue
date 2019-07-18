@@ -561,8 +561,8 @@
                 return pagesArray;
             },
             calcularTotal: function(){
-                var resultado=0.0;
-                for(var i=0;i<this.arrayDetalle.length;i++){
+                var resultado = 0.0;
+                for(var i = 0;i < this.arrayDetalle.length;i++){
                     resultado=resultado+(this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad-this.arrayDetalle[i].descuento)
                 }
                 return resultado;
@@ -570,26 +570,26 @@
         },
         methods : {
             listarVenta (page,buscar,criterio){
-                let me=this;
-                var url= '/venta?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                let me = this;
+                var url = '/venta?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
-                    var respuesta= response.data;
+                    var respuesta = response.data;
                     me.arrayVenta = respuesta.ventas.data;
-                    me.pagination= respuesta.pagination;
+                    me.pagination = respuesta.pagination;
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
             },
             selectCliente(search,loading){
-                let me=this;
+                let me = this;
                 loading(true)
 
-                var url= '/cliente/selectCliente?filtro='+search;
+                var url = '/cliente/selectCliente?filtro='+search;
                 axios.get(url).then(function (response) {
                     let respuesta = response.data;
                     q: search
-                    me.arrayCliente=respuesta.clientes;
+                    me.arrayCliente = respuesta.clientes;
                     loading(false)
                 })
                 .catch(function (error) {
@@ -625,7 +625,6 @@
                     console.log(error);
                 });
             },
-
             cambiarPagina(page,buscar,criterio){
                 let me = this;
                 //Actualiza la página actual
@@ -634,10 +633,10 @@
                 me.listarVenta(page,buscar,criterio);
             },
             encuentra(id){
-                var sw=0;
-                for(var i=0;i<this.arrayDetalle.length;i++){
-                    if(this.arrayDetalle[i].idarticulo==id){
-                        sw=true;
+                var sw = 0;
+                for(var i = 0;i < this.arrayDetalle.length;i++){
+                    if(this.arrayDetalle[i].idarticulo == id){
+                        sw = true;
                     }
                 }
                 return sw;
@@ -647,8 +646,8 @@
                 me.arrayDetalle.splice(index, 1);
             },
             agregarDetalle(){
-                let me=this;
-                if(me.idarticulo==0 || me.cantidad==0 || me.precio==0){
+                let me = this;
+                if(me.idarticulo == 0 || me.cantidad == 0 || me.precio == 0){
                 }
                 else{
                     if(me.encuentra(me.idarticulo)){
@@ -659,7 +658,7 @@
                             })
                     }
                     else{
-                       if(me.cantidad>me.stock){
+                       if(me.cantidad > me.stock){
                            swal({
                             type: 'error',
                             title: 'Error...',
@@ -676,24 +675,21 @@
                                 descuento: me.descuento,
                                 stock: me.stock
                             });
-                            me.codigo="";
-                            me.idarticulo=0;
-                            me.articulo="";
-                            me.cantidad=0;
-                            me.contenido=0;
-                            me.precio=0;
-                            me.descuento=0;
-                            me.stock=0
+                            me.codigo = "";
+                            me.idarticulo = 0;
+                            me.articulo = "";
+                            me.cantidad = 0;
+                            me.contenido = 0;
+                            me.precio = 0;
+                            me.descuento = 0;
+                            me.stock = 0
                        }
                     }
                     
                 }
-
-                
-
             },
             agregarDetalleModal(data =[]){
-                let me=this;
+                let me = this;
                 if(me.encuentra(data['id'])){
                         swal({
                             type: 'error',
@@ -708,16 +704,16 @@
                             cantidad: 1,
                             contenido: data['contenido'],
                             precio: data['precio_venta'],
-                            descuento:0,
+                            descuento: 0,
                             stock:data['stock']
                         }); 
                     }
             },
             listarArticulo (buscar,criterio){
-                let me=this;
-                var url= '/articulo/listarArticuloVenta?buscar='+ buscar + '&criterio='+ criterio;
+                let me = this;
+                var url = '/articulo/listarArticuloVenta?buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
-                    var respuesta= response.data;
+                    var respuesta = response.data;
                     me.arrayArticulo = respuesta.articulos.data;
                 })
                 .catch(function (error) {
@@ -744,106 +740,106 @@
                     'data': this.arrayDetalle
 
                 }).then(function (response) {
-                    me.listado=1;
+                    me.listado = 1;
                     me.listarVenta(1,'','num_comprobante');
-                    me.idcliente=0;
-                    me.tipo_comprobante='BOLETA';
-                    me.serie_comprobante='';
-                    me.num_comprobante='';
-                    me.impuesto=0.18;
-                    me.tipo_venta='';
-                    me.fecha_pago='';
-                    me.abono=0;
-                    me.total=0.0;
-                    me.idarticulo=0;
-                    me.articulo='';
-                    me.cantidad=0;
-                    me.contenido=0;
-                    me.precio=0;
-                    me.stock=0;
-                    me.codigo='';
-                    me.descuento=0;
-                    me.arrayDetalle=[];
+                    me.idcliente = 0;
+                    me.tipo_comprobante = 'BOLETA';
+                    me.serie_comprobante = '';
+                    me.num_comprobante = '';
+                    me.impuesto = 0.18;
+                    me.tipo_venta = '';
+                    me.fecha_pago = '';
+                    me.abono = 0;
+                    me.total = 0.0;
+                    me.idarticulo = 0;
+                    me.articulo = '';
+                    me.cantidad = 0;
+                    me.contenido = 0;
+                    me.precio = 0;
+                    me.stock = 0;
+                    me.codigo = '';
+                    me.descuento = 0;
+                    me.arrayDetalle = [];
 
                 }).catch(function (error) {
                     console.log(error);
                 });
             },
             validarVenta(){
-                let me=this;
-                me.errorVenta=0;
-                me.errorMostrarMsjVenta =[];
+                let me = this;
+                me.errorVenta = 0;
+                me.errorMostrarMsjVenta = [];
                 var art;
                 
                 me.arrayDetalle.map(function(x){
-                    if (x.cantidad>x.stock){
-                        art=x.articulo + " con stock insuficiente";
+                    if (x.cantidad > x.stock){
+                        art = x.articulo + " con stock insuficiente";
                         me.errorMostrarMsjVenta.push(art);
                     }
                 });
-                if (me.tipo_venta==0) me.errorMostrarMsjVenta.push("Seleccione un Tipo de Venta");
-                if (me.idcliente==0) me.errorMostrarMsjVenta.push("Seleccione un Cliente");
-                if (me.tipo_comprobante==0) me.errorMostrarMsjVenta.push("Seleccione el comprobante");
+                if (me.tipo_venta == 0) me.errorMostrarMsjVenta.push("Seleccione un Tipo de Venta");
+                if (me.idcliente == 0) me.errorMostrarMsjVenta.push("Seleccione un Cliente");
+                if (me.tipo_comprobante == 0) me.errorMostrarMsjVenta.push("Seleccione el comprobante");
                 if (!me.num_comprobante) me.errorMostrarMsjVenta.push("Ingrese el número de comprobante");
                 if (!me.impuesto) me.errorMostrarMsjVenta.push("Ingrese el impuesto de compra");
-                if (me.arrayDetalle.length<=0) me.errorMostrarMsjVenta.push("Ingrese detalles");
+                if (me.arrayDetalle.length <= 0) me.errorMostrarMsjVenta.push("Ingrese detalles");
 
                 if (me.errorMostrarMsjVenta.length) me.errorVenta = 1;
 
                 return me.errorVenta;
             },
             mostrarDetalle(){
-                let me=this;
-                me.listado=0;
+                let me = this;
+                me.listado = 0;
 
-                me.idproveedor=0;
-                me.tipo_comprobante='BOLETA';
-                me.serie_comprobante='';
-                me.num_comprobante='';
-                me.impuesto=0.18;
-                me.tipo_venta='';
-                me.fecha_pago='';
-                me.abono=0;
-                me.total=0.0;
-                me.idarticulo=0;
-                me.articulo='';
-                me.cantidad=0;
-                me.contenido=0;
-                me.precio=0;
-                me.arrayDetalle=[];
+                me.idproveedor = 0;
+                me.tipo_comprobante = 'BOLETA';
+                me.serie_comprobante = '';
+                me.num_comprobante = '';
+                me.impuesto = 0.18;
+                me.tipo_venta = '';
+                me.fecha_pago = '';
+                me.abono = 0;
+                me.total = 0.0;
+                me.idarticulo = 0;
+                me.articulo = '';
+                me.cantidad = 0;
+                me.contenido = 0;
+                me.precio = 0;
+                me.arrayDetalle = [];
             },
             ocultarDetalle(){
-                this.listado=1;
+                this.listado = 1;
             },
             verVenta(id){
-                let me=this;
-                me.listado=2;
+                let me = this;
+                me.listado = 2;
                 
                 //Obtener los datos del ingreso
-                var arrayVentaT=[];
-                var url= '/venta/obtenerCabecera?id=' + id;
+                var arrayVentaT = [];
+                var url = '/venta/obtenerCabecera?id=' + id;
                 
                 axios.get(url).then(function (response) {
-                    var respuesta= response.data;
+                    var respuesta = response.data;
                     arrayVentaT = respuesta.venta;
 
                     me.cliente = arrayVentaT[0]['nombre'];
-                    me.tipo_comprobante=arrayVentaT[0]['tipo_comprobante'];
-                    me.serie_comprobante=arrayVentaT[0]['serie_comprobante'];
-                    me.num_comprobante=arrayVentaT[0]['num_comprobante'];
-                    me.impuesto=arrayVentaT[0]['impuesto'];
-                    me.total=arrayVentaT[0]['total'];
+                    me.tipo_comprobante = arrayVentaT[0]['tipo_comprobante'];
+                    me.serie_comprobante = arrayVentaT[0]['serie_comprobante'];
+                    me.num_comprobante = arrayVentaT[0]['num_comprobante'];
+                    me.impuesto = arrayVentaT[0]['impuesto'];
+                    me.total = arrayVentaT[0]['total'];
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
 
                 //Obtener los datos de los detalles 
-                var urld= '/venta/obtenerDetalles?id=' + id;
+                var urld = '/venta/obtenerDetalles?id=' + id;
                 
                 axios.get(urld).then(function (response) {
                     console.log(response);
-                    var respuesta= response.data;
+                    var respuesta = response.data;
                     me.arrayDetalle = respuesta.detalles;
                 })
                 .catch(function (error) {
@@ -851,8 +847,8 @@
                 });               
             },
             cerrarModal(){
-                this.modal=0;
-                this.tituloModal='';
+                this.modal = 0;
+                this.tituloModal = '';
             }, 
             abrirModal(){               
                 this.arrayArticulo=[];

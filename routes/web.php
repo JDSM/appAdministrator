@@ -69,11 +69,17 @@ Route::group(['middleware' => 'auth'], function () {
     });
     
     Route::group(['middleware' => ['Administrador']], function () {
+        //Produccion
+        Route::get('/produccion','ProduccionController@index');
+        Route::post('/produccion/registrar','ProduccionController@store');
+        Route::get('/produccion/edit','ProduccionController@edit');
+        Route::get('/produccion/obtenerDetalles','ProduccionController@obtenerDetalles');
         //Receta
         Route::get('/receta','RecetaController@index');
         Route::get('/receta/edit','RecetaController@edit');
         Route::get('/receta/obtenerDetalles','RecetaController@obtenerDetalles');
         Route::post('/receta/registrar','RecetaController@store');
+        Route::post('/receta/update','RecetaController@update');
         Route::put('/receta/desactivar','RecetaController@desactivar');
         //Categoria
         Route::get('/categoria','CategoriaController@index');
@@ -89,6 +95,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::put('/articulo/desactivar','ArticuloController@desactivar');
         Route::put('/articulo/activar','ArticuloController@activar');
         Route::get('/articulo/buscarArticulo', 'ArticuloController@buscarArticulo');
+        Route::get('/articulo/buscarArticuloProduccion', 'ArticuloController@buscarArticuloProduccion');
         Route::get('/articulo/listarArticulo','ArticuloController@listarArticulo');
         Route::get('/articulo/listarArticuloVenta','ArticuloController@listarArticuloVenta');
         Route::get('/articulo/buscarArticuloVenta', 'ArticuloController@buscarArticuloVenta');

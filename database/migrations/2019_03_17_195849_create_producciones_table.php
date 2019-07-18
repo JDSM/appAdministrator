@@ -15,12 +15,13 @@ class CreateProduccionesTable extends Migration
     {
         Schema::create('producciones', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('idreceta')->unsigned();
+            $table->integer('idarticulo')->unsigned();
             $table->integer('cantidad_p')->unsigned();
             $table->decimal('costo_total', 11, 2);
             $table->integer('cantidad_artprinc');
+            $table->integer('idingrediente_principal');
             $table->timestamps();
-            $table->foreign('idreceta')->references('id')->on('recetas');
+            $table->foreign('idarticulo')->references('id')->on('articulos');
         });
     }
 

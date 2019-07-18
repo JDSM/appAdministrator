@@ -26,7 +26,7 @@ Vue.component('ingreso-component', require('./components/IngresoComponent.vue'))
 Vue.component('venta-component', require('./components/VentaComponent.vue'));
 Vue.component('dashboard-component', require('./components/DashboardComponent.vue'));
 Vue.component('receta-component', require('./components/RecetaComponent.vue'));
-//Vue.component('produccion-component', require('./components/ProduccionComponent.vue'));
+Vue.component('produccion-component', require('./components/ProduccionComponent.vue'));
 
 const app = new Vue({
     el: '#app',

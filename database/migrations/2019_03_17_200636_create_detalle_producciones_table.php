@@ -14,10 +14,10 @@ class CreateDetalleProduccionesTable extends Migration
     public function up()
     {
         Schema::create('detalle_producciones', function (Blueprint $table) {
+            $table->increments('id');
             $table->integer('idproduccion')->unsigned();
             $table->integer('idarticulo')->unsigned();
             $table->integer('contenido')->unsigned();
-            $table->decimal('costo_articulo', 11, 2);
             $table->timestamps();
             $table->foreign('idarticulo')->references('id')->on('articulos');
             $table->foreign('idproduccion')->references('id')->on('producciones');
