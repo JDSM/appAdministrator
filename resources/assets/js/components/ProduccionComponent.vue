@@ -36,6 +36,7 @@
                                     <th>Código Artículo</th>
                                     <th>Nombre Artículo</th>
                                     <th>Cantidad Producida</th>
+                                    <th>Costo</th>
                                     <th>Fecha de Producción</th>
                                 </tr>
                             </thead>
@@ -52,6 +53,7 @@
                                     <td v-text="produccion.codigo"></td>
                                     <td v-text="produccion.nombre"></td>
                                     <td v-text="produccion.cantidad_p"></td>
+                                    <td v-text="produccion.costo_total"></td>
                                     <td v-text="produccion.created_at"></td>
                                 </tr>                                
                             </tbody>
@@ -182,7 +184,7 @@
                             <div class="form-group">
                                 <label>Artículo a Producir:</label>
                                 <input type="text" hidden v-model="idarticulo">
-                                <p v-text="nombre"></p>                                 
+                                <p v-text="articulo"></p>                                 
                             </div>
                         </div>
                         <div class="col-md-6" >
@@ -202,13 +204,13 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Cantidad (g,ml,c/u):</label>
-                                <input type="number" class="form-control" v-model="contenido_ingrediente"  v-on:change="costoIngrediente(costo_real_ingrediente,contenido_ingrediente,cantidad_ingrediente)">
+                                <input type="number" class="form-control" v-model="contenido_ingrediente"  v-on:change="costoIngrediente(costo_ingrediente,contenido_ingrediente,cantidad_ingrediente)">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Costo:</label>
-                                <input type="number" class="form-control" v-model="costo_ingrediente" readonly>
+                                <input type="number" class="form-control" v-model="costo_ingre_p" readonly>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -463,7 +465,8 @@
                 costo_total: 0,
                 cantidad_ingrediente: 0,
                 costo_real_ingrediente: 0,
-                cantidad_producida: 0
+                cantidad_producida: 0,
+                costo_ingre_p:0
             }
         },
         components: {
@@ -502,7 +505,7 @@
                     resultado = resultado+(this.calcularCosto(this.arrayDetalle[i]))
                 }
                     //console.log(this.arrayDetalle);
-                return resultado+this.costo_ingrediente;
+                return resultado+parseFloat(this.costo_ingre_p);
             }
         },
         watch : {
@@ -599,11 +602,11 @@
             },
             encuentra(id) {
                 let me = this;
-                console.log("entra"+id+'/'+me.arrayDetalle.length);
+                //console.log("entra"+id+'/'+me.arrayDetalle.length);
                 
                 var sw = 0;
                 for (let i = 0; i < me.arrayDetalle.length; i++) {
-                    console.log(me.arrayDetalle[i].idarticulo);
+                    //console.log(me.arrayDetalle[i].idarticulo);
                     if (me.arrayDetalle[i].idarticulo == id) {
                         sw = true;
                     } 
@@ -653,7 +656,7 @@
                     me.arrayDetalle.push({
                         idingredientes: data['id'],
                         ingredientes: data['nombre'],
-                        contenido_ingredientes: 1,
+                        contenido_ingredientes: data['contenido'],
                         costo_ingredientes: data['precio_venta'],
                         cantidad_ingredientes : data['contenido']
                     });
@@ -673,8 +676,11 @@
                     //console.log("no entra");
                     me.idingrediente = data['id'];
                     me.ingrediente = data['nombre'];
+                    me.costo_ingrediente = data['precio_venta'];
+                    me.costo_ingre_p = data['precio_venta'];
+                    me.cantidad_ingrediente = data['contenido'];
                     console.log('ingrediente', me.ingrediente);
-                    me.contenido_ingrediente = 1;
+                    me.contenido_ingrediente = data['contenido'];
               
                 }
             },
@@ -817,7 +823,7 @@
             },
             costoIngrediente(costo_ingrediente,contenido_ingrediente,cantidad_ingrediente){
                 console.log(costo_ingrediente,contenido_ingrediente,cantidad_ingrediente);
-                this.costo_ingrediente = (contenido_ingrediente*costo_ingrediente)/cantidad_ingrediente;
+                this.costo_ingre_p = (contenido_ingrediente*costo_ingrediente)/cantidad_ingrediente;
             },
             verProduccion(id){
                 let me = this;

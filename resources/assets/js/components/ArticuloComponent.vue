@@ -23,8 +23,13 @@
                                 <select class="form-control col-md-3" v-model="criterio" >
                                     <option value="nombre">Nombre</option>
                                     <option value="descripcion">Descripción</option>
+                                    <option value="idcategoria">Categoria</option>
                                 </select>
-                                <input type="text" v-model="buscar" @keyup.enter="listarArticulo(1, buscar, criterio)" class="form-control" placeholder="Texto a buscar">
+                                <input v-if="criterio != 'idcategoria'" type="text" v-model="buscar" @keyup.enter="listarArticulo(1, buscar, criterio)" class="form-control" placeholder="Texto a buscar">
+                                <select v-else class="form-control" v-model="buscar" @click="selectCategoria()">
+                                    <option value="0" disabled>Seleccione</option>
+                                    <option v-for="categoria in arrayCategoria" :key='categoria.id' :value="categoria.id" v-text="categoria.nombre"></option>
+                                </select>
                                 <button type="submit" @click="listarArticulo(1, buscar, criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                             </div>
                         </div>
@@ -38,8 +43,8 @@
                                 <th>Categoría</th>
                                 <th>Precio Venta</th>
                                 <th>Stock</th>
+                                <th>Contenido c/u</th>
                                 <th>Contenido</th>
-                                <th>Tipo</th>
                                 <th>Descripción</th>
                                 <th>Estado</th>
                             </tr>
@@ -67,7 +72,7 @@
                                 <td v-text="articulo.precio_venta"></td>
                                 <td v-text="articulo.stock"></td>
                                 <td v-text="articulo.contenido"></td>
-                                <td v-text="articulo.tipo"></td>
+                                <td v-text="articulo.contenido * articulo.stock"></td>
                                 <td v-text="articulo.descripcion"></td>
                                 <td>
                                     <div v-if="articulo.condicion">
@@ -135,7 +140,7 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-md-3 form-control-label" for="text-input">Precio de Venta</label>
+                                <label class="col-md-3 form-control-label" for="text-input">Precio de Costo</label>
                                 <div class="col-md-9">
                                     <input type="number" v-model="precio_venta" class="form-control" placeholder="">
                                 </div>

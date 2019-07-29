@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 use App\Produccion;
+use App\Ingreso;
+use App\Articulo;
+use App\DetalleIngreso;
 use App\DetalleProduccion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -80,6 +83,34 @@ class ProduccionController extends Controller
             $produccion->costo_total = $request->costo_total;
             $produccion->cantidad_artprinc = $request->cantidad_artprinc;
             $produccion->save();
+            
+            //se resta del stock  la cantidad consumida en la producción del articulo (ingrediente principal) 
+            $articulo_p = Articulo::findOrFail($request->idingrediente);
+            $articulo_p->stock = $articulo_p->stock - ($request->cantidad_artprinc/$articulo_p->contenido);
+            $articulo_p->save();
+
+            $articulo = Articulo::findOrFail($request->idarticulo);
+            $articulo->stock = $articulo->stock + $request->cantidad_p;
+            $articulo->save();
+            // $ingreso = new Ingreso();
+            // $ingreso->idproveedor = ;
+            // $ingreso->idusuario = \Auth::user()->id;
+            // $ingreso->tipo_comprobante = 'BOLETA';
+            // $ingreso->serie_comprobante = $request->idarticulo;
+            // $ingreso->num_comprobante = $produccion->id;
+            // $ingreso->impuesto = 0;
+            // $ingreso->total = $request->costo_total;
+            // $ingreso->estado = 'Registrado';
+            // $ingreso->fecha_hora = $mytime->toDateString();
+            // $ingreso->save();
+
+
+            // $dingreso = new DetalleIngreso();
+            // $dingreso->idingreso =  $ingreso->id;
+            // $dingreso->idarticulo = $request->idarticulo;
+            // $dingreso->cantidad = $request->cantidad_p;
+            // $dingreso->precio = $request->costo_total;
+            // $dingreso->save();
 
             $detalles = $request->data; //Array de detalles
             //Recorre todos los elementos
@@ -87,9 +118,14 @@ class ProduccionController extends Controller
             {
                 $detalle = new DetalleProduccion();
                 $detalle->idproduccion = $produccion->id;
-                $detalle->idarticulo = $det['idingrediente'];
+                $detalle->idarticulo = $det['idingredientes'];
                 $detalle->contenido = $det['contenido_ingredientes'];
                 $detalle->save();
+
+                //se resta del stock  la cantidad consumida en la producción del articulo (ingredientes) 
+                $articulo_i = Articulo::findOrFail($det['idingredientes']);
+                $articulo_i->stock = $articulo_i->stock - ($det['contenido_ingredientes']/$articulo_i->contenido);
+                $articulo_i->save();
             }
             DB::commit();
 
@@ -103,9 +139,9 @@ class ProduccionController extends Controller
         if(!$request->ajax()){
             return redirect('/');
         }
-        $ingreso = Ingreso::findOrFail($request->id);
-        $ingreso->estado = 'Anulado';
-        $ingreso->save();
+        $produccion = Produccion::findOrFail($request->id);
+        $produccion->estado = 'Anulado';
+        $produccion->save();
     }
     public function update(Request $request){
         if(!$request->ajax()){

@@ -36,7 +36,7 @@
                 </li>
             </ul>
             <ul class="nav navbar-nav ml-auto">
-                <li class="nav-item d-md-down-none">
+                <!-- <li class="nav-item d-md-down-none">
                     <a class="nav-link" href="#" data-toggle="dropdown">
                         <i class="icon-bell"></i>
                         <span class="badge badge-pill badge-danger">5</span>
@@ -58,13 +58,13 @@
                             <span class="badge badge-danger">2</span>
                         </a>
                     </div>
-                </li>
+                </li> -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                        <img src="img/avatars/6.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
+                    <a class="nav-link dropdown-toggle nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" id="sesion">
+                        <img src="img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
                         <span class="d-md-down-none">{{Auth::user()->usuario}} </span>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right">
+                    <div class="dropdown-menu dropdown-menu-right" id="dcuenta">
                         <div class="dropdown-header text-center">
                             <strong>Cuenta</strong>
                         </div>
@@ -105,6 +105,15 @@
     </footer>
     <script src="js/app.js"></script>
     <script src="js/plantilla.js"></script>
+    <script>
+        $("#sesion").on("click", function(){
+            if ($("#dcuenta").hasClass('show')){
+                $("#dcuenta").removeClass("show");
+            }else{
+                $("#dcuenta").addClass("show");
+            }
+        });
+    </script>
 </body>
 
 </html>

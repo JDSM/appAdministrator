@@ -48747,7 +48747,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n.mostrar {\n    display: list-item !important;\n    opacity: 1 !important;\n    position: absolute !important;\n    background-color: #3c29297a !important;\n}\n.div-error {\n    display: flex;\n    justify-content: center;\n}\n", ""]);
+exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n", ""]);
 
 // exports
 
@@ -49450,7 +49450,6 @@ var render = function() {
       {
         staticClass: "modal fade",
         class: { mostrar: _vm.modal },
-        staticStyle: { display: "none" },
         attrs: {
           tabindex: "-1",
           role: "dialog",
@@ -49792,6 +49791,11 @@ exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    po
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_barcode__ = __webpack_require__(68);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_barcode___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue_barcode__);
+//
+//
+//
+//
+//
 //
 //
 //
@@ -53002,40 +53006,99 @@ var render = function() {
                     _vm._v(" "),
                     _c("option", { attrs: { value: "descripcion" } }, [
                       _vm._v("Descripción")
+                    ]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "idcategoria" } }, [
+                      _vm._v("Categoria")
                     ])
                   ]
                 ),
                 _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.buscar,
-                      expression: "buscar"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: { type: "text", placeholder: "Texto a buscar" },
-                  domProps: { value: _vm.buscar },
-                  on: {
-                    keyup: function($event) {
-                      if (
-                        !("button" in $event) &&
-                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-                      ) {
-                        return null
+                _vm.criterio != "idcategoria"
+                  ? _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.buscar,
+                          expression: "buscar"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: { type: "text", placeholder: "Texto a buscar" },
+                      domProps: { value: _vm.buscar },
+                      on: {
+                        keyup: function($event) {
+                          if (
+                            !("button" in $event) &&
+                            _vm._k(
+                              $event.keyCode,
+                              "enter",
+                              13,
+                              $event.key,
+                              "Enter"
+                            )
+                          ) {
+                            return null
+                          }
+                          _vm.listarArticulo(1, _vm.buscar, _vm.criterio)
+                        },
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.buscar = $event.target.value
+                        }
                       }
-                      _vm.listarArticulo(1, _vm.buscar, _vm.criterio)
-                    },
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.buscar = $event.target.value
-                    }
-                  }
-                }),
+                    })
+                  : _c(
+                      "select",
+                      {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.buscar,
+                            expression: "buscar"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        on: {
+                          click: function($event) {
+                            _vm.selectCategoria()
+                          },
+                          change: function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.buscar = $event.target.multiple
+                              ? $$selectedVal
+                              : $$selectedVal[0]
+                          }
+                        }
+                      },
+                      [
+                        _c("option", { attrs: { value: "0", disabled: "" } }, [
+                          _vm._v("Seleccione")
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.arrayCategoria, function(categoria) {
+                          return _c("option", {
+                            key: categoria.id,
+                            domProps: {
+                              value: categoria.id,
+                              textContent: _vm._s(categoria.nombre)
+                            }
+                          })
+                        })
+                      ],
+                      2
+                    ),
                 _vm._v(" "),
                 _c(
                   "button",
@@ -53147,7 +53210,9 @@ var render = function() {
                     }),
                     _vm._v(" "),
                     _c("td", {
-                      domProps: { textContent: _vm._s(articulo.tipo) }
+                      domProps: {
+                        textContent: _vm._s(articulo.contenido * articulo.stock)
+                      }
                     }),
                     _vm._v(" "),
                     _c("td", {
@@ -53476,7 +53541,7 @@ var render = function() {
                           staticClass: "col-md-3 form-control-label",
                           attrs: { for: "text-input" }
                         },
-                        [_vm._v("Precio de Venta")]
+                        [_vm._v("Precio de Costo")]
                       ),
                       _vm._v(" "),
                       _c("div", { staticClass: "col-md-9" }, [
@@ -53783,9 +53848,9 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Stock")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Contenido")]),
+        _c("th", [_vm._v("Contenido c/u")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Tipo")]),
+        _c("th", [_vm._v("Contenido")]),
         _vm._v(" "),
         _c("th", [_vm._v("Descripción")]),
         _vm._v(" "),
@@ -53889,7 +53954,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n.mostrar {\n    display: list-item !important;\n    opacity: 1 !important;\n    position: absolute !important;\n    background-color: #3c29297a !important;\n}\n.div-error {\n    display: flex;\n    justify-content: center;\n}\n", ""]);
+exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n", ""]);
 
 // exports
 
@@ -54510,7 +54575,6 @@ var render = function() {
       {
         staticClass: "modal fade",
         class: { mostrar: _vm.modal },
-        staticStyle: { display: "none" },
         attrs: {
           tabindex: "-1",
           role: "dialog",
@@ -55006,7 +55070,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n.mostrar {\n    display: list-item !important;\n    opacity: 1 !important;\n    position: absolute !important;\n    background-color: #3c29297a !important;\n}\n.div-error {\n    display: flex;\n    justify-content: center;\n}\n", ""]);
+exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n", ""]);
 
 // exports
 
@@ -55657,7 +55721,6 @@ var render = function() {
       {
         staticClass: "modal fade",
         class: { mostrar: _vm.modal },
-        staticStyle: { display: "none" },
         attrs: {
           tabindex: "-1",
           role: "dialog",
@@ -56231,7 +56294,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n.mostrar {\n    display: list-item !important;\n    opacity: 1 !important;\n    position: absolute !important;\n    background-color: #3c29297a !important;\n}\n.div-error {\n    display: flex;\n    justify-content: center;\n}\n", ""]);
+exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n", ""]);
 
 // exports
 
@@ -56740,7 +56803,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n.mostrar {\n    display: list-item !important;\n    opacity: 1 !important;\n    position: absolute !important;\n    background-color: #3c29297a !important;\n}\n.div-error {\n    display: flex;\n    justify-content: center;\n}\n", ""]);
+exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n", ""]);
 
 // exports
 
@@ -57542,7 +57605,6 @@ var render = function() {
       {
         staticClass: "modal fade",
         class: { mostrar: _vm.modal },
-        staticStyle: { display: "none" },
         attrs: {
           tabindex: "-1",
           role: "dialog",
@@ -58174,7 +58236,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n.mostrar {\n    display: list-item !important;\n    opacity: 1 !important;\n    position: absolute !important;\n    background-color: #3c29297a !important;\n}\n.div-error {\n    display: flex;\n    justify-content: center;\n}\n.text-error{\n    color: red !important;\n    font-weight: bold;\n}\n@media (min-width: 600px){\n.btnagregar{\n        margin-top: 2rem;\n}\n}\n", ""]);
+exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n@media (min-width: 600px){\n.btnagregar{\n        margin-top: 2rem;\n}\n}\n", ""]);
 
 // exports
 
@@ -60848,7 +60910,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.modal-content{\n    width: 100% !important;\n    position: absolute !important;\n}\n.mostrar{\n    display: list-item !important;\n    opacity: 1 !important;\n    position: absolute !important;\n    background-color: #3c29297a !important;\n}\n.div-error{\n    display: flex;\n    justify-content: center;\n}\n.text-error{\n    color: red !important;\n    font-weight: bold;\n}\n@media (min-width: 600px) {\n.btnagregar {\n        margin-top: 2rem;\n}\n}\n\n", ""]);
+exports.push([module.i, "\n.modal-content{\n    width: 100% !important;\n    position: absolute !important;\n}\n@media (min-width: 600px) {\n.btnagregar {\n        margin-top: 2rem;\n}\n}\n\n", ""]);
 
 // exports
 
@@ -63434,7 +63496,6 @@ var render = function() {
       {
         staticClass: "modal fade",
         class: { mostrar: _vm.modal },
-        staticStyle: { display: "none" },
         attrs: {
           tabindex: "-1",
           role: "dialog",
@@ -64280,7 +64341,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n.mostrar {\n    display: list-item !important;\n    opacity: 1 !important;\n    position: absolute !important;\n    background-color: #3c29297a !important;\n}\n.div-error {\n    display: flex;\n    justify-content: center;\n}\n.text-error{\n    color: red !important;\n    font-weight: bold;\n}\n@media (min-width: 600px){\n.btnagregar{\n        margin-top: 2rem;\n}\n}\n", ""]);
+exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n@media (min-width: 600px){\n.btnagregar{\n        margin-top: 2rem;\n}\n}\n", ""]);
 
 // exports
 
@@ -66511,7 +66572,6 @@ var render = function() {
       {
         staticClass: "modal fade",
         class: { mostrar: _vm.modal },
-        staticStyle: { display: "none" },
         attrs: {
           tabindex: "-1",
           role: "dialog",
@@ -67008,7 +67068,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n.mostrar {\n    display: list-item !important;\n    opacity: 1 !important;\n    position: absolute !important;\n    background-color: #3c29297a !important;\n}\n.div-error {\n    display: flex;\n    justify-content: center;\n}\n.text-error{\n    color: red !important;\n    font-weight: bold;\n}\n@media (min-width: 600px){\n.btnagregar{\n        margin-top: 2rem;\n}\n}\n", ""]);
+exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    position: absolute !important;\n}\n@media (min-width: 600px){\n.btnagregar{\n        margin-top: 2rem;\n}\n}\n", ""]);
 
 // exports
 
@@ -67021,6 +67081,8 @@ exports.push([module.i, "\n.modal-content {\n    width: 100% !important;\n    po
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_select__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_select___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue_select__);
+//
+//
 //
 //
 //
@@ -67486,7 +67548,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             costo_total: 0,
             cantidad_ingrediente: 0,
             costo_real_ingrediente: 0,
-            cantidad_producida: 0
+            cantidad_producida: 0,
+            costo_ingre_p: 0
         };
     },
 
@@ -67526,7 +67589,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 resultado = resultado + this.calcularCosto(this.arrayDetalle[i]);
             }
             //console.log(this.arrayDetalle);
-            return resultado + this.costo_ingrediente;
+            return resultado + parseFloat(this.costo_ingre_p);
         }
     },
     watch: {},
@@ -67614,11 +67677,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         encuentra: function encuentra(id) {
             var me = this;
-            console.log("entra" + id + '/' + me.arrayDetalle.length);
+            //console.log("entra"+id+'/'+me.arrayDetalle.length);
 
             var sw = 0;
             for (var i = 0; i < me.arrayDetalle.length; i++) {
-                console.log(me.arrayDetalle[i].idarticulo);
+                //console.log(me.arrayDetalle[i].idarticulo);
                 if (me.arrayDetalle[i].idarticulo == id) {
                     sw = true;
                 }
@@ -67665,7 +67728,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 me.arrayDetalle.push({
                     idingredientes: data['id'],
                     ingredientes: data['nombre'],
-                    contenido_ingredientes: 1,
+                    contenido_ingredientes: data['contenido'],
                     costo_ingredientes: data['precio_venta'],
                     cantidad_ingredientes: data['contenido']
                 });
@@ -67686,8 +67749,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 //console.log("no entra");
                 me.idingrediente = data['id'];
                 me.ingrediente = data['nombre'];
+                me.costo_ingrediente = data['precio_venta'];
+                me.costo_ingre_p = data['precio_venta'];
+                me.cantidad_ingrediente = data['contenido'];
                 console.log('ingrediente', me.ingrediente);
-                me.contenido_ingrediente = 1;
+                me.contenido_ingrediente = data['contenido'];
             }
         },
         agregarArticulo: function agregarArticulo() {
@@ -67826,7 +67892,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         costoIngrediente: function costoIngrediente(costo_ingrediente, contenido_ingrediente, cantidad_ingrediente) {
             console.log(costo_ingrediente, contenido_ingrediente, cantidad_ingrediente);
-            this.costo_ingrediente = contenido_ingrediente * costo_ingrediente / cantidad_ingrediente;
+            this.costo_ingre_p = contenido_ingrediente * costo_ingrediente / cantidad_ingrediente;
         },
         verProduccion: function verProduccion(id) {
             var me = this;
@@ -68121,6 +68187,12 @@ var render = function() {
                               _c("td", {
                                 domProps: {
                                   textContent: _vm._s(produccion.cantidad_p)
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(produccion.costo_total)
                                 }
                               }),
                               _vm._v(" "),
@@ -68637,7 +68709,7 @@ var render = function() {
                             }),
                             _vm._v(" "),
                             _c("p", {
-                              domProps: { textContent: _vm._s(_vm.nombre) }
+                              domProps: { textContent: _vm._s(_vm.articulo) }
                             })
                           ])
                         ]),
@@ -68767,7 +68839,7 @@ var render = function() {
                               on: {
                                 change: function($event) {
                                   _vm.costoIngrediente(
-                                    _vm.costo_real_ingrediente,
+                                    _vm.costo_ingrediente,
                                     _vm.contenido_ingrediente,
                                     _vm.cantidad_ingrediente
                                   )
@@ -68793,19 +68865,19 @@ var render = function() {
                                 {
                                   name: "model",
                                   rawName: "v-model",
-                                  value: _vm.costo_ingrediente,
-                                  expression: "costo_ingrediente"
+                                  value: _vm.costo_ingre_p,
+                                  expression: "costo_ingre_p"
                                 }
                               ],
                               staticClass: "form-control",
                               attrs: { type: "number", readonly: "" },
-                              domProps: { value: _vm.costo_ingrediente },
+                              domProps: { value: _vm.costo_ingre_p },
                               on: {
                                 input: function($event) {
                                   if ($event.target.composing) {
                                     return
                                   }
-                                  _vm.costo_ingrediente = $event.target.value
+                                  _vm.costo_ingre_p = $event.target.value
                                 }
                               }
                             })
@@ -69272,7 +69344,6 @@ var render = function() {
       {
         staticClass: "modal fade",
         class: { mostrar: _vm.modal },
-        staticStyle: { display: "none" },
         attrs: {
           tabindex: "-1",
           role: "dialog",
@@ -69675,6 +69746,8 @@ var staticRenderFns = [
         _c("th", [_vm._v("Nombre Artículo")]),
         _vm._v(" "),
         _c("th", [_vm._v("Cantidad Producida")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Costo")]),
         _vm._v(" "),
         _c("th", [_vm._v("Fecha de Producción")])
       ])
