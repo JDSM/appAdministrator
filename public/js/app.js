@@ -61404,6 +61404,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -61422,6 +61423,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             arrayVenta: [],
             arrayCliente: [],
             arrayDetalle: [],
+            arrayDetalleVen: [],
             listado: 1,
             modal: 0,
             tituloModal: '',
@@ -61488,7 +61490,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         calcularTotal: function calcularTotal() {
             var resultado = 0.0;
+            //console.log(this.arrayDetalle.length,'antes:',this.arrayDetalleVen.length);
+            if (this.arrayDetalle.length != this.arrayDetalleVen.length) {
+                this.arrayDetalleVen[this.arrayDetalle.length - 1] = Object.assign({}, this.arrayDetalle[this.arrayDetalle.length - 1]);
+                // this.arrayDetalleVen[this.arrayDetalle.length-1] = this.arrayDetalle[this.arrayDetalle.length-1];
+                //console.log(this.arrayDetalle.length,'nuevo:',this.arrayDetalleVen.length);
+            }
             for (var i = 0; i < this.arrayDetalle.length; i++) {
+                console.log('original:', this.arrayDetalle[i]['cantidad']);
+                if (this.arrayDetalle[i]['cantidad'] != '') {
+                    //console.log('si');
+                    this.arrayDetalle[i]['contenido'] = this.arrayDetalleVen[i].contenido * this.arrayDetalle[i].cantidad;
+                }
                 resultado = resultado + (this.arrayDetalle[i].precio * this.arrayDetalle[i].cantidad - this.arrayDetalle[i].descuento);
             }
             return resultado;
@@ -63074,13 +63087,38 @@ var render = function() {
                                           })
                                         ]),
                                         _vm._v(" "),
-                                        _c("td", {
-                                          domProps: {
-                                            textContent: _vm._s(
-                                              detalle.contenido
-                                            )
-                                          }
-                                        }),
+                                        _c("td", [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: detalle.contenido,
+                                                expression: "detalle.contenido"
+                                              }
+                                            ],
+                                            staticClass: "form-control",
+                                            attrs: {
+                                              type: "number",
+                                              disabled: ""
+                                            },
+                                            domProps: {
+                                              value: detalle.contenido
+                                            },
+                                            on: {
+                                              input: function($event) {
+                                                if ($event.target.composing) {
+                                                  return
+                                                }
+                                                _vm.$set(
+                                                  detalle,
+                                                  "contenido",
+                                                  $event.target.value
+                                                )
+                                              }
+                                            }
+                                          })
+                                        ]),
                                         _vm._v(" "),
                                         _c("td", [
                                           _c(
@@ -67511,6 +67549,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             nombre: '',
             arrayProduccion: [],
             arrayDetalle: [],
+            arrayDetalleRec: [],
             arrayArticulo: [],
             arrayIngrediente: [],
             arrayIngredientes: [],
@@ -67549,7 +67588,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             cantidad_ingrediente: 0,
             costo_real_ingrediente: 0,
             cantidad_producida: 0,
-            costo_ingre_p: 0
+            costo_ingre_p: 0,
+            cantidad_ip_receta: 0
         };
     },
 
@@ -67724,7 +67764,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     text: " Ese Artículo ya se encuentra agregado"
                 });
             } else {
-                console.log(data);
+                //console.log(data);
                 me.arrayDetalle.push({
                     idingredientes: data['id'],
                     ingredientes: data['nombre'],
@@ -67771,7 +67811,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 //console.log("no entra");
                 me.idarticulo = data['id'];
                 me.articulo = data['nombre'];
-                console.log('articulo', me.articulo);
+                //console.log('articulo', me.articulo);
                 me.editProduccion(me.idarticulo);
             }
         },
@@ -67891,7 +67931,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             return contenido_ingredientes * costo_ingredientes / cantidad_ingredientes;
         },
         costoIngrediente: function costoIngrediente(costo_ingrediente, contenido_ingrediente, cantidad_ingrediente) {
-            console.log(costo_ingrediente, contenido_ingrediente, cantidad_ingrediente);
+            //console.log('cambio',this.arrayDetalleRec,'cant ingred:',cantidad_ingrediente,'cant_ip_rec:',this.cantidad_ip_receta);
+            //console.log(this.cantidad_ip_receta);
+            if (this.cantidad_ip_receta != 0) {
+                for (var i = 0; i < this.arrayDetalle.length; i++) {
+                    //console.log(this.arrayDetalle[i]['contenido_ingredientes']);
+                    if (this.arrayDetalle[i]['id'] == this.arrayDetalleRec[i]['id']) {
+                        this.arrayDetalle[i]['contenido_ingredientes'] = contenido_ingrediente * this.arrayDetalleRec[i]['contenido_ingredientes'] / this.cantidad_ip_receta;
+                    }
+                }
+            }
+            //console.log(this.arrayDetalle);
             this.costo_ingre_p = contenido_ingrediente * costo_ingrediente / cantidad_ingrediente;
         },
         verProduccion: function verProduccion(id) {
@@ -67903,7 +67953,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 arrayProduccionT = respuesta.produccion;
-                console.log(respuesta, respuesta.produccion);
+                //console.log(respuesta,respuesta.produccion);
                 me.idarticulo = arrayProduccionT[0]['idarticulo'];
                 me.articulo = arrayProduccionT[0]['nombre'];
                 me.idingrediente = arrayProduccionT[0]['idingrediente'];
@@ -67941,9 +67991,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 me.ingrediente = arrayProduccionT[0]['nombre_ingrediente'];
                 me.contenido_ingrediente = arrayProduccionT[0]['contenido'];
                 me.nombre = arrayProduccionT[0]['nombre'];
-                me.costo_ingrediente = arrayProduccionT[0]['contenido'] * arrayProduccionT[0]['costo_ingrediente'] / arrayProduccionT[0]['contenido_ingrediente'];
+                //me.costo_ingrediente = (arrayProduccionT[0]['contenido']*arrayProduccionT[0]['costo_ingrediente'])/arrayProduccionT[0]['contenido_ingrediente']; 
                 me.cantidad_ingrediente = arrayProduccionT[0]['contenido_ingrediente'];
                 me.costo_real_ingrediente = arrayProduccionT[0]['costo_ingrediente'];
+                me.costo_ingre_p = arrayProduccionT[0]['contenido'] * arrayProduccionT[0]['costo_ingrediente'] / arrayProduccionT[0]['contenido_ingrediente'];
+                me.costo_ingrediente = arrayProduccionT[0]['costo_ingrediente'];
+                me.cantidad_ip_receta = arrayProduccionT[0]['contenido'];
             }).catch(function (error) {
                 console.log(error);
             });
@@ -67952,6 +68005,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             axios.get(urld).then(function (response) {
                 var respuesta = response.data;
                 me.arrayDetalle = respuesta.detalles;
+                for (var i = 0; i < respuesta.detalles.length; i++) {
+                    //console.log(this.arrayDetalle[i]['contenido_ingredientes']);
+                    me.arrayDetalleRec[i] = Object.assign({}, respuesta.detalles[i]);
+                }
+                //me.arrayDetalleRec = respuesta.detalles;
+                //console.log('Receta',me.arrayDetalleRec);
                 //console.log(me.arrayDetalle[0].costo_ingredientes);
             }).catch(function (error) {
                 console.log(error);
@@ -68156,19 +68215,6 @@ var render = function() {
                                 ),
                                 _vm._v(
                                   "  \n                                    "
-                                ),
-                                _c(
-                                  "button",
-                                  {
-                                    staticClass: "btn btn-danger btn-sm",
-                                    attrs: { type: "button" },
-                                    on: {
-                                      click: function($event) {
-                                        _vm.desactivarProduccion(produccion.id)
-                                      }
-                                    }
-                                  },
-                                  [_c("i", { staticClass: "icon-trash" })]
                                 )
                               ]),
                               _vm._v(" "),

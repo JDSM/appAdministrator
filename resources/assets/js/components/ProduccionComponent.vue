@@ -46,9 +46,9 @@
                                         <button type="button" @click="verProduccion(produccion.id)" class="btn btn-success btn-sm">
                                         <i class="icon-eye"></i>
                                         </button> &nbsp;
-                                        <button type="button" class="btn btn-danger btn-sm" @click="desactivarProduccion(produccion.id)">
+                                        <!-- <button type="button" class="btn btn-danger btn-sm" @click="desactivarProduccion(produccion.id)">
                                             <i class="icon-trash"></i>
-                                        </button>
+                                        </button> -->
                                     </td>
                                     <td v-text="produccion.codigo"></td>
                                     <td v-text="produccion.nombre"></td>
@@ -428,6 +428,7 @@
                 nombre : '',
                 arrayProduccion : [],
                 arrayDetalle : [],
+                arrayDetalleRec : [],
                 arrayArticulo : [],
                 arrayIngrediente : [],
                 arrayIngredientes : [],
@@ -466,7 +467,8 @@
                 cantidad_ingrediente: 0,
                 costo_real_ingrediente: 0,
                 cantidad_producida: 0,
-                costo_ingre_p:0
+                costo_ingre_p: 0,
+                cantidad_ip_receta: 0
             }
         },
         components: {
@@ -652,7 +654,7 @@
                     })
                 }
                 else {
-                    console.log(data);
+                    //console.log(data);
                     me.arrayDetalle.push({
                         idingredientes: data['id'],
                         ingredientes: data['nombre'],
@@ -698,7 +700,7 @@
                     //console.log("no entra");
                     me.idarticulo = data['id'];
                     me.articulo = data['nombre'];
-                    console.log('articulo', me.articulo);
+                    //console.log('articulo', me.articulo);
                     me.editProduccion(me.idarticulo);
                 }
             },
@@ -822,7 +824,17 @@
 
             },
             costoIngrediente(costo_ingrediente,contenido_ingrediente,cantidad_ingrediente){
-                console.log(costo_ingrediente,contenido_ingrediente,cantidad_ingrediente);
+                //console.log('cambio',this.arrayDetalleRec,'cant ingred:',cantidad_ingrediente,'cant_ip_rec:',this.cantidad_ip_receta);
+                //console.log(this.cantidad_ip_receta);
+                if (this.cantidad_ip_receta != 0){
+                    for(var i = 0;i < this.arrayDetalle.length;i++){
+                        //console.log(this.arrayDetalle[i]['contenido_ingredientes']);
+                        if (this.arrayDetalle[i]['id'] == this.arrayDetalleRec[i]['id']) {
+                            this.arrayDetalle[i]['contenido_ingredientes'] = (contenido_ingrediente * this.arrayDetalleRec[i]['contenido_ingredientes'])/this.cantidad_ip_receta;
+                        }
+                    }
+                }
+                //console.log(this.arrayDetalle);
                 this.costo_ingre_p = (contenido_ingrediente*costo_ingrediente)/cantidad_ingrediente;
             },
             verProduccion(id){
@@ -835,7 +847,7 @@
                 .then(function(response) {
                     var respuesta = response.data;
                     arrayProduccionT = respuesta.produccion;
-                    console.log(respuesta,respuesta.produccion);
+                    //console.log(respuesta,respuesta.produccion);
                     me.idarticulo = arrayProduccionT[0]['idarticulo'];
                     me.articulo = arrayProduccionT[0]['nombre'];
                     me.idingrediente = arrayProduccionT[0]['idingrediente'];
@@ -877,9 +889,12 @@
                     me.ingrediente = arrayProduccionT[0]['nombre_ingrediente'];
                     me.contenido_ingrediente = arrayProduccionT[0]['contenido'];
                     me.nombre = arrayProduccionT[0]['nombre'];
-                    me.costo_ingrediente = (arrayProduccionT[0]['contenido']*arrayProduccionT[0]['costo_ingrediente'])/arrayProduccionT[0]['contenido_ingrediente']; 
+                    //me.costo_ingrediente = (arrayProduccionT[0]['contenido']*arrayProduccionT[0]['costo_ingrediente'])/arrayProduccionT[0]['contenido_ingrediente']; 
                     me.cantidad_ingrediente = arrayProduccionT[0]['contenido_ingrediente'];
                     me.costo_real_ingrediente = arrayProduccionT[0]['costo_ingrediente'];
+                    me.costo_ingre_p = (arrayProduccionT[0]['contenido']*arrayProduccionT[0]['costo_ingrediente'])/arrayProduccionT[0]['contenido_ingrediente'];
+                    me.costo_ingrediente = arrayProduccionT[0]['costo_ingrediente'];
+                    me.cantidad_ip_receta = arrayProduccionT[0]['contenido'];
                 })
                 .catch(function(error) {
                     console.log(error);
@@ -890,6 +905,12 @@
                 .then(function(response) {
                     var respuesta = response.data;
                     me.arrayDetalle = respuesta.detalles;
+                    for(var i = 0;i < respuesta.detalles.length;i++){
+                        //console.log(this.arrayDetalle[i]['contenido_ingredientes']);
+                        me.arrayDetalleRec[i]=  Object.assign({}, respuesta.detalles[i]);
+                    }
+                    //me.arrayDetalleRec = respuesta.detalles;
+                    //console.log('Receta',me.arrayDetalleRec);
                     //console.log(me.arrayDetalle[0].costo_ingredientes);
                 })
                 .catch(function(error) {

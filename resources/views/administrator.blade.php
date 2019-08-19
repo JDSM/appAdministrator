@@ -9,7 +9,7 @@
     <meta name="author" content="Appadm.com">
     <meta name="keyword" content="Sistema ventas Aministrator, Sistema compras Administrator">
     <link rel="shortcut icon" href="img/favicon.png">
-    <title>Sistema Ventas - Administrator</title>
+    <title>Sistema Ventas - Oriente Party</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js">
     <!-- Icons -->

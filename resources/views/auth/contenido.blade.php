@@ -9,7 +9,7 @@
   <meta name="author" content="Jellycius.com">
   <meta name="keyword" content="Sistema ventas Jellycius">
 
-  <title>Sistema Ventas - IncanatoIT</title>
+  <title>Sistema Ventas - Oriente Party</title>
 
   <link href="css/plantilla.css" rel="stylesheet">
 

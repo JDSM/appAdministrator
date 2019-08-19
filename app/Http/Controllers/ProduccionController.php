@@ -117,13 +117,21 @@ class ProduccionController extends Controller
             foreach($detalles as $ep=>$det)
             {
                 $detalle = new DetalleProduccion();
+                if (isset($det['idingrediente'])) {
+                    $detalle->idarticulo = $det['idingrediente'];
+                }else{
+                    $detalle->idarticulo = $det['idingredientes'];
+                }
                 $detalle->idproduccion = $produccion->id;
-                $detalle->idarticulo = $det['idingredientes'];
                 $detalle->contenido = $det['contenido_ingredientes'];
                 $detalle->save();
 
                 //se resta del stock  la cantidad consumida en la producción del articulo (ingredientes) 
-                $articulo_i = Articulo::findOrFail($det['idingredientes']);
+                if (isset($det['idingrediente'])) {
+                    $articulo_i = Articulo::findOrFail($det['idingrediente']);
+                }else{
+                    $articulo_i = Articulo::findOrFail($det['idingredientes']);
+                }
                 $articulo_i->stock = $articulo_i->stock - ($det['contenido_ingredientes']/$articulo_i->contenido);
                 $articulo_i->save();
             }

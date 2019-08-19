@@ -263,7 +263,8 @@
                                                 <span style="color:red;" v-show="detalle.cantidad>detalle.stock">Stock: {{detalle.stock}}</span>
                                                 <input v-model="detalle.cantidad" type="number" class="form-control">
                                             </td>
-                                            <td v-text="detalle.contenido">
+                                            <td >
+                                                <input v-model="detalle.contenido" type="number" class="form-control" disabled>
                                             </td>
                                             <td>
                                                 <span style="color:red;" v-show="detalle.descuento>(detalle.precio*detalle.cantidad)">Descuento superior</span>
@@ -497,6 +498,7 @@
                 arrayVenta : [],
                 arrayCliente: [],
                 arrayDetalle : [],
+                arrayDetalleVen : [], 
                 listado:1,
                 modal : 0,
                 tituloModal : '',
@@ -562,8 +564,19 @@
             },
             calcularTotal: function(){
                 var resultado = 0.0;
+                //console.log(this.arrayDetalle.length,'antes:',this.arrayDetalleVen.length);
+                if (this.arrayDetalle.length != this.arrayDetalleVen.length) {
+                    this.arrayDetalleVen[this.arrayDetalle.length-1] = Object.assign({}, this.arrayDetalle[this.arrayDetalle.length-1])
+                    // this.arrayDetalleVen[this.arrayDetalle.length-1] = this.arrayDetalle[this.arrayDetalle.length-1];
+                    //console.log(this.arrayDetalle.length,'nuevo:',this.arrayDetalleVen.length);
+                }
                 for(var i = 0;i < this.arrayDetalle.length;i++){
-                    resultado=resultado+(this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad-this.arrayDetalle[i].descuento)
+                    console.log('original:',this.arrayDetalle[i]['cantidad']);
+                    if (this.arrayDetalle[i]['cantidad'] != '') {
+                        //console.log('si');
+                        this.arrayDetalle[i]['contenido'] = this.arrayDetalleVen[i].contenido * this.arrayDetalle[i].cantidad;
+                    }
+                    resultado=resultado+(this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad-this.arrayDetalle[i].descuento);
                 }
                 return resultado;
             }
